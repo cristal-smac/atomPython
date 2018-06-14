@@ -6,10 +6,10 @@ m = Market()
 m.add_asset(OrderBook('Apple'))
 m.add_asset(OrderBook('Microsoft'))
 
-for i in range(2):
+for i in range(20):
     t = ZITTrader(['Apple'], [50])
     m.add_trader(t)
-for i in range(5):
+for i in range(2000):
     m.run_once()
 
 ## Test replay

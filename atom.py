@@ -19,15 +19,18 @@
 # - Vérifier s'il y a des matchs à chaque rajout d'ordre, pas une fois que tous les ordres ont été rajoutés
 # - Modifier le prix du match comme étant le prix le plus ancien
 # - Modification des ZIT pour qu'ils ne puissent plus avoir une quantité d'actions négative
+# - Utilisation de MinHeap et MaxHeap pour OrderBook.asks et OrderBook.bids plutôt que des listes triées. Si n est la taille du carnet d'ordre, l'ajout d'ordre se faisait en O(nlog n), maintenant il se fait en O(log n). Pour 20 agents et 2000 ticks, on passe d'un temps d'exécution de 24s à 2.6s.
 #
 # TODO :
 #
-# - Regarder s'il existe un équivalent des TreeSet (Java) en Python pour les Orderbooks.asks/bids : on n'a besoin que des meilleurs éléments de la liste, pas d'avoir une liste entièrement (utiliser un tas-min et un tas-max ?)
+# - Ajouter une option pour pouvoir balancer la trace dans un fichier trace.dat plutôt que dans le printer
+# - Revenir sur la modification des ZIT : la solution choisie a l'air très couteuse en temps (on doit parcourir l'orderbook à chaque fois...) alors que si on garde en mémoire un entier égal au nombre d'actions concernées par un BID, on augmente la complexité spatialle seulement de (nb agent * nb asset) et il n'y a plus de lourd calcul à faire (il faut juste penser, à chaque fois qu'on a un match, à updater cette quantité)...
 
 import random
 import pylab as plt
 import numpy as np
 import pandas as pd
+import binary_heap as bh
 import matplotlib.mlab as mlab
 
 
@@ -81,7 +84,7 @@ class ZITTrader(Trader):
         s_assets = dict()
         for asset in self.available_assets:
             # Quantité d'actions vendable = quantité d'actions dont on dispose moins la quantité d'actions déjà inclues dans un ordre BID pour cet asset.
-            q = self.assets[asset] - sum([order.qty for order in market.orderbooks[asset].asks if order.source == self and order.direction == 'ASK'])
+            q = self.assets[asset] - sum([order.qty for order in market.orderbooks[asset].asks.values() if order.source == self and order.direction == 'ASK'])
             if q > 0:
                 s_assets[asset] = q
         return s_assets
@@ -105,11 +108,12 @@ class ZITTrader(Trader):
 class OrderBook:
     def __init__(self, name):
         self.name = name
-        self.bids = []
-        self.asks = []
+        self.bids = bh.MaxHeap(lambda x: x.price)
+        self.asks = bh.MinHeap(lambda x: x.price)
         self.last_transaction = None
     def __str__(self):
-        return self.name + "\n" + str([str(x) for x in self.asks]) + "\n" + str([str(x) for x in self.bids])
+        return "" # TODO
+        # return self.name + "\n" + str([str(x) for x in self.asks]) + "\n" + str([str(x) for x in self.bids])
     def add_order(self, order, market):
         if order.direction == "BID":
             self.add_bid(order)
@@ -119,26 +123,24 @@ class OrderBook:
         while self.match(order.direction, market) != None:
             pass
     def add_bid(self, order):
-        self.bids.append(order)
-        self.bids.sort(key=lambda o: -o.price)
+        self.bids.insert(order)
     def add_ask(self, order):
-        self.asks.append(order)
-        self.asks.sort(key=lambda o: o.price)
+        self.asks.insert(order)
     def match(self, dir, market): # Si une transaction est possible, l'effectue, sachant que le dernier ordre ajouté a pour direction dir. Sinon, retourne None.
-        if (len(self.asks) == 0) | (len(self.bids) == 0):
+        if (self.asks.size == 0) or (self.bids.size == 0):
             return None
-        if self.asks[0].price > self.bids[0].price:
+        if self.asks.root().price > self.bids.root().price:
             return None
-        ask = self.asks.pop(0)
-        bid = self.bids.pop(0)
+        ask = self.asks.extract_root()
+        bid = self.bids.extract_root()
         qty = min(ask.qty, bid.qty)
         price = bid.price if dir == 'ASK' else ask.price # Prend le prix de l'ordre le plus ancien
         if ask.qty > qty:
             ask.decrease_qty(qty)
-            self.asks.insert(0, ask)
+            self.asks.insert(ask)
         if bid.qty > qty:
             bid.decrease_qty(qty)
-            self.bids.insert(0, bid)
+            self.bids.insert(bid)
         # On modifie les agents
         ask.source.add_money(price*qty)
         ask.source.add_assets(self.name, -qty)
@@ -186,8 +188,6 @@ class Market:
     def run_once(self):
         self.update_time()
         random.shuffle(self.traders)
-        # Modifier la suite ?
-        # Ne devrait-on pas vérifier s'il y a des match après chaque ajout d'ordre ?
         for t in self.traders:
             decision = t.place_order(self)
             if decision != None:
