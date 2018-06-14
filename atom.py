@@ -18,10 +18,10 @@
 # - Ajouter une trace des ordres, prix et agents
 # - Vérifier s'il y a des matchs à chaque rajout d'ordre, pas une fois que tous les ordres ont été rajoutés
 # - Modifier le prix du match comme étant le prix le plus ancien
+# - Modification des ZIT pour qu'ils ne puissent plus avoir une quantité d'actions négative
 #
 # TODO :
 #
-# - Modification des ZIT pour ne plus qu'ils aient une quantité d'actions négatives
 # - Regarder s'il existe un équivalent des TreeSet (Java) en Python pour les Orderbooks.asks/bids : on n'a besoin que des meilleurs éléments de la liste, pas d'avoir une liste entièrement (utiliser un tas-min et un tas-max ?)
 
 import random
@@ -48,14 +48,16 @@ class LimitOrder:
 
 class Trader(object):
     trader_count = 0
-    def __init__(self, available_assets=[], money=0, auto=False):
+    def __init__(self, available_assets=[], initial_assets=None, money=0):
         Trader.trader_count += 1
         self.trader_id = Trader.trader_count
         self.money = money
         self.available_assets = available_assets
         self.assets = dict()
-        for a in available_assets:
-            self.assets[a] = 0
+        if initial_assets == None:
+            initial_assets = [0]*len(available_assets)
+        for cpt, asset in enumerate(available_assets):
+            self.assets[asset] = initial_assets[cpt]
     def __str__(self):
         return str(self.trader_id)
     def make_available(self, asset):
@@ -75,9 +77,29 @@ class Trader(object):
 class ZITTrader(Trader):
     def __str__(self):
         return "ZIT " + super().__str__()
+    def sellable_assets(self, market):
+        s_assets = dict()
+        for asset in self.available_assets:
+            # Quantité d'actions vendable = quantité d'actions dont on dispose moins la quantité d'actions déjà inclues dans un ordre BID pour cet asset.
+            q = self.assets[asset] - sum([order.qty for order in market.orderbooks[asset].asks if order.source == self and order.direction == 'ASK'])
+            if q > 0:
+                s_assets[asset] = q
+        return s_assets
     def place_order(self, market):
-        asset = random.choice(self.available_assets)
-        return LimitOrder(asset, self, random.choice(['ASK', 'BID']), random.randint(1, 100), random.randint(1, 100))
+        s_assets = self.sellable_assets(market)
+        if bool(s_assets): # si s_assets n'est pas vide
+            # Si on a encore qqchose à vendre, on choisi aléatoirement entre achat et vente
+            dir = random.choice(['ASK', 'BID'])
+            if dir == 'BID':
+                return LimitOrder(random.choice(self.available_assets), self, 'BID', random.randint(1, 100), random.randint(1, 100))
+            else:
+                asset = random.choice(list(s_assets.keys()))
+                # On ne vend pas une qté > à celle qu'on peut vendre, et jamais plus que 100.
+                return LimitOrder(asset, self, 'ASK', random.randint(1, 100), random.randint(1, min(100, s_assets[asset])))
+        else:
+            # On ne peut rien vendre -> on achète
+            asset = random.choice(self.available_assets)
+            return LimitOrder(asset, self, 'BID', random.randint(1, 100), random.randint(1, 100))
 
 
 class OrderBook:
