@@ -20,19 +20,24 @@
 # (3) Modifier le prix du match comme étant le prix le plus ancien
 # (4) Modification des ZIT pour qu'ils ne puissent plus avoir une quantité d'actions négative
 # (5) Utilisation de MinHeap et MaxHeap pour OrderBook.asks et OrderBook.bids plutôt que des listes triées. Si n est la taille du carnet d'ordre, l'ajout d'ordre se faisait en O(nlog n), maintenant il se fait en O(log n). Pour 20 agents et 2000 ticks, on passe d'un temps d'exécution de 24s à 2.6s.
-# (6) Revenir sur la modification des ZIT : la solution choisie a l'air très couteuse en temps (on doit parcourir l'orderbook à chaque fois...) alors que si on garde en mémoire un entier égal au nombre d'actions concernées par un BID, on augmente la complexité spatialle seulement de (nb agent * nb asset) et il n'y a plus de lourd calcul à faire (il faut juste penser, à chaque fois qu'on a un match, à updater cette quantité)...
+# (6) Revenir sur la modification des ZIT : la solution choisie a l'air très coûteuse en temps (on doit parcourir l'orderbook à chaque fois...) alors que si on garde en mémoire un entier égal au nombre d'actions concernées par un BID, on augmente la complexité spatialle seulement de (nb agent * nb asset) et il n'y a plus de lourd calcul à faire (il faut juste penser, à chaque fois qu'on a un match, à updater cette quantité)...
 #   C'est implémenté... En pratique, le temps de calcul n'est pas changé même pour un grand nombre d'agents et de ticks... Je ne comprends pas pourquoi. Peut-être que Python optimise les calculs faits dans la version précédente. 
+# (7) Ajouter une option pour pouvoir balancer la trace dans un fichier trace.dat plutôt que dans le out.writeer (utile pour utiliser ensuite atom dans Jupyter...)
 #
 # TODO :
 #
-# - Ajouter une option pour pouvoir balancer la trace dans un fichier trace.dat plutôt que dans le printer (utile pour utiliser ensuite atom dans Jupyter...)
+# - Refaire les méthodes __str__
+# - Ajouter des méthodes qui renvoient directement les données 'traitées' à partir d'un fichier (trace.dat), puisque c'est assez "lourd".
 
 import random
+import sys
 import pylab as plt
 import numpy as np
 import pandas as pd
-import binary_heap as bh
 import matplotlib.mlab as mlab
+
+import binary_heap as bh
+from data_processing import *
 
 
 class LimitOrder:
@@ -122,7 +127,7 @@ class OrderBook:
             self.add_bid(order)
         else:
             self.add_ask(order)
-        print("Order;%s;%s;%s;%i;%i" % tuple(order.attribute_list()))
+        market.out.write("Order;%s;%s;%s;%i;%i\n" % tuple(order.attribute_list()))
         while self.match(order.direction, market) != None:
             pass
     def add_bid(self, order):
@@ -154,20 +159,21 @@ class OrderBook:
         self.last_transaction = (bid.source, ask.source, price, qty)
         market.prices[self.name] = price
         # On affiche le prix
-        print("Price;%s;%s;%s;%i;%i" % (self.name, bid.source.__str__(), ask.source.__str__(), price, qty))
+        market.out.write("Price;%s;%s;%s;%i;%i\n" % (self.name, bid.source.__str__(), ask.source.__str__(), price, qty))
         # On affiche les agents qui ont été modifiés
-        print("Agent;%s;%i;%s;%i" % (ask.source.__str__(), ask.source.money, self.name, ask.source.assets[self.name]))
+        market.out.write("Agent;%s;%i;%s;%i\n" % (ask.source.__str__(), ask.source.money, self.name, ask.source.assets[self.name]))
         if ask.source != bid.source: # Pour ne pas afficher deux fois la même ligne si l'agent ayant émis le ask et celui ayant émis le bid est le même.
-            print("Agent;%s;%i;%s;%i" % (bid.source.__str__(), bid.source.money, self.name, bid.source.assets[self.name]))
+            market.out.write("Agent;%s;%i;%s;%i\n" % (bid.source.__str__(), bid.source.money, self.name, bid.source.assets[self.name]))
         return self.last_transaction
 
 
 class Market:
-    def __init__(self):
+    def __init__(self, outfile=None):
         self.time = 0
         self.traders = []
         self.orderbooks = dict()
         self.prices = dict()
+        self.out = sys.stdout if outfile == None else open(outfile, 'w')
     def __str__(self):
         return "Market with %i traders on assets: %s" % (len(self.traders), str(self.orderbooks.keys()))
     def add_asset(self, orderbook):
@@ -187,17 +193,17 @@ class Market:
         for asset in self.orderbooks.keys():
             if self.prices[asset] != None:
                 at_least_one_price = True
-                print("Tick;%i;%s;%i" % (self.time, asset, self.prices[asset]))
+                self.out.write("Tick;%i;%s;%i\n" % (self.time, asset, self.prices[asset]))
         if not(at_least_one_price):
-            print("Tick;%i" % self.time)
+            self.out.write("Tick;%i\n" % self.time)
     def run_once(self):
-        self.update_time()
         random.shuffle(self.traders)
         for t in self.traders:
             decision = t.place_order(self)
             if decision != None:
                 if decision.asset in self.orderbooks:
                     self.orderbooks[decision.asset].add_order(decision, self)
+        self.update_time()
     def replay(self, order_list):
         '''Run a list of orders of the form (asset, direction, price, qty).'''
         t = Trader(self.orderbooks.keys())
