@@ -120,7 +120,7 @@ class LimitOrder
     {	this(extId,direction,price,quantity,-1);} // infinite life 
     
     public String toString()
-    {	return (sender.name+";"+extId+";L;"+direction+";"+price+";"+quantity+";"+validity); }
+    {	return ("Order;"+sender.name+";"+extId+";L;"+direction+";"+price+";"+quantity+";"+validity); }
 }
 
 //---------------------------------
@@ -204,7 +204,9 @@ class OrderBook
 	// lastPrices.add(pc);
 	numberOfPricesFixed++;
 	lastFixedPrice = pc;
-	/* TRACE */ System.out.println("#Price;"+pc);
+	/* TRACE */ System.out.println("Price;"+pc);
+	// System.out.println("Time;"+System.currentTimeMillis());
+	// Il fixe plusieurs prix dans la meme milliseconde !!
     }
 
 
@@ -289,11 +291,11 @@ class OrderBook
 
 		// notification aux agents
 		bbid.sender.touchedOrExecutedOrder(bbid);
-		/* TRACE */ System.out.println("#Agent;"+bbid.sender.name+";"+bbid.sender.cash+";"+bbid.sender.invest+";"+(lastFixedPrice!=null?lastFixedPrice.price:null));
-		/* TRACE */ if (bbid.quantity==0) System.out.println("#Exec;"+bbid.sender.name+"-"+bbid.extId);
+		/* TRACE */ System.out.println("Agent;"+bbid.sender.name+";"+bbid.sender.cash+";"+bbid.sender.invest+";"+(lastFixedPrice!=null?lastFixedPrice.price:null));
+		/* TRACE */ if (bbid.quantity==0) System.out.println("Exec;"+bbid.sender.name+"-"+bbid.extId);
 		bask.sender.touchedOrExecutedOrder(bask);
-		/* TRACE */ System.out.println("#Agent;"+bask.sender.name+";"+bask.sender.cash+";"+bask.sender.invest+";"+(lastFixedPrice!=null?lastFixedPrice.price:null));
-		/* TRACE */ if (bask.quantity==0) System.out.println("#Exec;"+bask.sender.name+"-"+bask.extId);
+		/* TRACE */ System.out.println("Agent;"+bask.sender.name+";"+bask.sender.cash+";"+bask.sender.invest+";"+(lastFixedPrice!=null?lastFixedPrice.price:null));
+		/* TRACE */ if (bask.quantity==0) System.out.println("Exec;"+bask.sender.name+"-"+bask.extId);
 
 		
 		// Nettoyage eventuel
@@ -418,7 +420,7 @@ class MarketPlace
 		    send(agent,lo);
 	    }
 	/* TRACE */ // System.out.println(ob);
-	/* TRACE */ System.out.println("#Tick;"+numberOfRounds+";"+ob.numberOfOrdersReceived);
+	/* TRACE */ System.out.println("Tick;"+numberOfRounds+";"+ob.numberOfOrdersReceived);
     }
 }
 
