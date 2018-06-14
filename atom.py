@@ -15,16 +15,17 @@
 #
 # DONE :
 #
-# - Ajouter une trace des ordres, prix et agents
-# - Vérifier s'il y a des matchs à chaque rajout d'ordre, pas une fois que tous les ordres ont été rajoutés
-# - Modifier le prix du match comme étant le prix le plus ancien
-# - Modification des ZIT pour qu'ils ne puissent plus avoir une quantité d'actions négative
-# - Utilisation de MinHeap et MaxHeap pour OrderBook.asks et OrderBook.bids plutôt que des listes triées. Si n est la taille du carnet d'ordre, l'ajout d'ordre se faisait en O(nlog n), maintenant il se fait en O(log n). Pour 20 agents et 2000 ticks, on passe d'un temps d'exécution de 24s à 2.6s.
+# (1) Ajouter une trace des ordres, prix et agents
+# (2) Vérifier s'il y a des matchs à chaque rajout d'ordre, pas une fois que tous les ordres ont été rajoutés
+# (3) Modifier le prix du match comme étant le prix le plus ancien
+# (4) Modification des ZIT pour qu'ils ne puissent plus avoir une quantité d'actions négative
+# (5) Utilisation de MinHeap et MaxHeap pour OrderBook.asks et OrderBook.bids plutôt que des listes triées. Si n est la taille du carnet d'ordre, l'ajout d'ordre se faisait en O(nlog n), maintenant il se fait en O(log n). Pour 20 agents et 2000 ticks, on passe d'un temps d'exécution de 24s à 2.6s.
+# (6) Revenir sur la modification des ZIT : la solution choisie a l'air très couteuse en temps (on doit parcourir l'orderbook à chaque fois...) alors que si on garde en mémoire un entier égal au nombre d'actions concernées par un BID, on augmente la complexité spatialle seulement de (nb agent * nb asset) et il n'y a plus de lourd calcul à faire (il faut juste penser, à chaque fois qu'on a un match, à updater cette quantité)...
+#   C'est implémenté... En pratique, le temps de calcul n'est pas changé même pour un grand nombre d'agents et de ticks... Je ne comprends pas pourquoi. Peut-être que Python optimise les calculs faits dans la version précédente. 
 #
 # TODO :
 #
-# - Ajouter une option pour pouvoir balancer la trace dans un fichier trace.dat plutôt que dans le printer
-# - Revenir sur la modification des ZIT : la solution choisie a l'air très couteuse en temps (on doit parcourir l'orderbook à chaque fois...) alors que si on garde en mémoire un entier égal au nombre d'actions concernées par un BID, on augmente la complexité spatialle seulement de (nb agent * nb asset) et il n'y a plus de lourd calcul à faire (il faut juste penser, à chaque fois qu'on a un match, à updater cette quantité)...
+# - Ajouter une option pour pouvoir balancer la trace dans un fichier trace.dat plutôt que dans le printer (utile pour utiliser ensuite atom dans Jupyter...)
 
 import random
 import pylab as plt
@@ -57,10 +58,12 @@ class Trader(object):
         self.money = money
         self.available_assets = available_assets
         self.assets = dict()
+        self.invested_assets = dict()
         if initial_assets == None:
             initial_assets = [0]*len(available_assets)
         for cpt, asset in enumerate(available_assets):
             self.assets[asset] = initial_assets[cpt]
+            self.invested_assets[asset] = 0
     def __str__(self):
         return str(self.trader_id)
     def make_available(self, asset):
@@ -84,7 +87,7 @@ class ZITTrader(Trader):
         s_assets = dict()
         for asset in self.available_assets:
             # Quantité d'actions vendable = quantité d'actions dont on dispose moins la quantité d'actions déjà inclues dans un ordre BID pour cet asset.
-            q = self.assets[asset] - sum([order.qty for order in market.orderbooks[asset].asks.values() if order.source == self and order.direction == 'ASK'])
+            q = self.assets[asset] - self.invested_assets[asset] # self.invested_assets[asset] = sum([order.qty for order in market.orderbooks[asset].asks.values() if order.source == self and order.direction == 'ASK']) -> cf commentaire (6)
             if q > 0:
                 s_assets[asset] = q
         return s_assets
@@ -126,6 +129,7 @@ class OrderBook:
         self.bids.insert(order)
     def add_ask(self, order):
         self.asks.insert(order)
+        order.source.invested_assets[self.name] += order.qty
     def match(self, dir, market): # Si une transaction est possible, l'effectue, sachant que le dernier ordre ajouté a pour direction dir. Sinon, retourne None.
         if (self.asks.size == 0) or (self.bids.size == 0):
             return None
@@ -144,6 +148,7 @@ class OrderBook:
         # On modifie les agents
         ask.source.add_money(price*qty)
         ask.source.add_assets(self.name, -qty)
+        ask.source.invested_assets[self.name] -= qty
         bid.source.add_money(-price*qty)
         bid.source.add_assets(self.name, qty)
         self.last_transaction = (bid.source, ask.source, price, qty)
