@@ -12,13 +12,17 @@
 """
    module atom
 """
-
+#
+# DONE :
+#
+# - Ajouter une trace des ordres, prix et agents
+# - Vérifier s'il y a des matchs à chaque rajout d'ordre, pas une fois que tous les ordres ont été rajoutés
+# - Modifier le prix du match comme étant le prix le plus ancien
 #
 # TODO :
 #
-# - Vérifier s'il y a des matchs à chaque rajout d'ordre, pas une fois que tous les ordres ont été rajoutés ?
-# - Corollaire : Modifier le prix du match comme étant le prix le plus ancien
-# - Regarder s'il existe un équivalent des TreeSet (Java) en Python pour les Orderbooks.asks/bids : on n'a besoin que des meilleurs éléments de la liste, pas d'avoir une liste entièrement triée
+# - Modification des ZIT pour ne plus qu'ils aient une quantité d'actions négatives
+# - Regarder s'il existe un équivalent des TreeSet (Java) en Python pour les Orderbooks.asks/bids : on n'a besoin que des meilleurs éléments de la liste, pas d'avoir une liste entièrement (utiliser un tas-min et un tas-max ?)
 
 import random
 import pylab as plt
@@ -90,13 +94,15 @@ class OrderBook:
         else:
             self.add_ask(order)
         print("Order;%s;%s;%s;%i;%i" % tuple(order.attribute_list()))
+        while self.match(order.direction, market) != None:
+            pass
     def add_bid(self, order):
         self.bids.append(order)
         self.bids.sort(key=lambda o: -o.price)
     def add_ask(self, order):
         self.asks.append(order)
         self.asks.sort(key=lambda o: o.price)
-    def match(self, market): # Si une transaction est possible, l'effectue. Sinon, retourne None.
+    def match(self, dir, market): # Si une transaction est possible, l'effectue, sachant que le dernier ordre ajouté a pour direction dir. Sinon, retourne None.
         if (len(self.asks) == 0) | (len(self.bids) == 0):
             return None
         if self.asks[0].price > self.bids[0].price:
@@ -104,7 +110,7 @@ class OrderBook:
         ask = self.asks.pop(0)
         bid = self.bids.pop(0)
         qty = min(ask.qty, bid.qty)
-        price = bid.price # TODO : à changer
+        price = bid.price if dir == 'ASK' else ask.price # Prend le prix de l'ordre le plus ancien
         if ask.qty > qty:
             ask.decrease_qty(qty)
             self.asks.insert(0, ask)
@@ -165,10 +171,6 @@ class Market:
             if decision != None:
                 if decision.asset in self.orderbooks:
                     self.orderbooks[decision.asset].add_order(decision, self)
-        for ob in self.orderbooks.values():
-            ob.last_transaction = None
-            while ob.match(self) != None:
-                pass
     def replay(self, order_list):
         '''Run a list of orders of the form (asset, direction, price, qty).'''
         t = Trader(self.orderbooks.keys())
@@ -178,7 +180,3 @@ class Market:
             asset, direction, price, qty = o
             order = LimitOrder(asset, t, direction, price, qty)
             self.orderbooks[asset].add_order(order, self)
-            for ob in self.orderbooks.values():
-                ob.last_transaction = None
-                while ob.match(self) != None:
-                    pass
