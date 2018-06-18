@@ -1,0 +1,26 @@
+# Order;asset;direction;price;qty
+
+Order;LVMH;BID;45500;13
+Order;LVMH;BID;42000;14
+Order;LVMH;ASK;12000;10
+Order;LVMH;BID;45800;17
+Order;LVMH;ASK;11500;10
+Order;LVMH;ASK;36000;12
+Order;LVMH;ASK;38500;12
+Order;LVMH;BID;34000;34
+Order;LVMH;ASK;19000;18
+Order;LVMH;ASK;11700;11
+Order;LVMH;ASK;24000;5
+
+# At the end, the orderbook is empty
+# Prices and Qty obtained:
+# Price;asset;bider;asker;price;qty
+# Price;LVMH;1;1;45500;10
+# Price;LVMH;1;1;45800;10
+# Price;LVMH;1;1;45800;7
+# Price;LVMH;1;1;45500;3
+# Price;LVMH;1;1;42000;2
+# Price;LVMH;1;1;42000;12
+# Price;LVMH;1;1;34000;18
+# Price;LVMH;1;1;34000;11
+# Price;LVMH;1;1;34000;5

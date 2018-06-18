@@ -40,43 +40,30 @@ from data_processing import *
 
 
 class LimitOrder:
-    def __init__(self, asset, source, direction, price, qty, time_to_live=None):
+    def __init__(self, asset, source, direction, price, qty):
         self.asset = asset
         self.source = source
         self.price = price
         self.direction = direction.upper()
         self.qty = qty
-        self.time_to_live = time_to_live
     def __str__(self):
-        if self.time_to_live == None:
-            return "%s %s at %.2f x %i from %s (life: immortal)" % (self.direction, self.asset, self.price, self.qty, self.source.trader_id)
-        else:
-            return "%s %s at %.2f x %i from %s (life: %i)" % (self.direction, self.asset, self.price, self.qty, self.source.trader_id, self.time_to_live)
+        return "%s %s at %.2f x %i from %s" % (self.direction, self.asset, self.price, self.qty, self.source.__str__())
     def decrease_qty(self, q):
         self.qty -= q
     def attribute_list(self):
-        return [self.asset, self.source.__str__(), self.direction, self.price, self.qty, self.time_to_live]
-    def decrease_life(self):
-        if self.time_to_live != None:
-            self.time_to_live -= 1
-    def is_dead(self):
-        return self.time_to_live == 0
+        return [self.asset, self.source.__str__(), self.direction, self.price, self.qty]
 
 
 class Trader(object):
     trader_count = 0
-    def __init__(self, available_assets=[], initial_assets=None, money=0):
+    def __init__(self, available_assets=[], money=0):
         Trader.trader_count += 1
         self.trader_id = Trader.trader_count
         self.money = money
         self.available_assets = available_assets
         self.assets = dict()
-        self.invested_assets = dict()
-        if initial_assets == None:
-            initial_assets = [0]*len(available_assets)
-        for cpt, asset in enumerate(available_assets):
-            self.assets[asset] = initial_assets[cpt]
-            self.invested_assets[asset] = 0
+        for asset in available_assets:
+            self.assets[asset] = 0
     def __str__(self):
         return str(self.trader_id)
     def make_available(self, asset):
@@ -91,39 +78,50 @@ class Trader(object):
         self.money += n
     def add_assets(self, asset, n):
         self.assets[asset] += n
+    def get_wealth(self, market):
+        w = self.money
+        for asset in self.available_assets:
+            w += self.assets[asset]*market.prices[asset]
+        return w
+    def get_infos(self, market):
+        s = self.__str__()+":\Cash: "+str(self.money)+"\n"
+        for asset in self.available_assets:
+            s += asset+": "+str(self.assets[asset])+"\n"
+        s += "Wealth: "+str(self.get_wealth(market))+"\n"
+        return s
     
 
+# class ZITTrader(Trader):
+#     def __str__(self):
+#         return "ZIT " + super().__str__()
+#     def sellable_assets(self, market):
+#         s_assets = dict()
+#         for asset in self.available_assets:
+#             # Quantité d'actions vendable = quantité d'actions dont on dispose moins la quantité d'actions déjà inclues dans un ordre BID pour cet asset.
+#             q = self.assets[asset] - self.invested_assets[asset] # self.invested_assets[asset] = sum([order.qty for order in market.orderbooks[asset].asks.values() if order.source == self and order.direction == 'ASK']) -> cf commentaire (6)
+#             if q > 0:
+#                 s_assets[asset] = q
+#         return s_assets
+#     def place_order(self, market):
+#         s_assets = self.sellable_assets(market)
+#         price = random.randint(1, 100)
+#         if bool(s_assets): # si s_assets n'est pas vide
+#             # Si on a encore qqchose à vendre, on choisi aléatoirement entre achat et vente
+#             dir = random.choice(['ASK', 'BID'])
+#             asset = random.choice(self.available_assets)
+#             if dir == 'BID':
+#                 return LimitOrder(asset, self, 'BID', price, random.randint(1, 100), random.randint(1, 5))
+#             else:
+#                 asset = random.choice(list(s_assets.keys()))
+#                 # On ne vend pas une qté > à celle qu'on peut vendre, et jamais plus que 100.
+#                 return LimitOrder(asset, self, 'ASK', price, random.randint(1, min(100,s_assets[asset])), random.randint(1, 5))
+#         else:
+#             # On ne peut rien vendre -> on achète
+#             asset = random.choice(self.available_assets)
+#             return LimitOrder(asset, self, 'BID', price, random.randint(1, 100), random.randint(1, 5))
+
+
 class ZITTrader(Trader):
-    def __str__(self):
-        return "ZIT " + super().__str__()
-    def sellable_assets(self, market):
-        s_assets = dict()
-        for asset in self.available_assets:
-            # Quantité d'actions vendable = quantité d'actions dont on dispose moins la quantité d'actions déjà inclues dans un ordre BID pour cet asset.
-            q = self.assets[asset] - self.invested_assets[asset] # self.invested_assets[asset] = sum([order.qty for order in market.orderbooks[asset].asks.values() if order.source == self and order.direction == 'ASK']) -> cf commentaire (6)
-            if q > 0:
-                s_assets[asset] = q
-        return s_assets
-    def place_order(self, market):
-        s_assets = self.sellable_assets(market)
-        price = random.randint(1, 100)
-        if bool(s_assets): # si s_assets n'est pas vide
-            # Si on a encore qqchose à vendre, on choisi aléatoirement entre achat et vente
-            dir = random.choice(['ASK', 'BID'])
-            asset = random.choice(self.available_assets)
-            if dir == 'BID':
-                return LimitOrder(asset, self, 'BID', price, random.randint(1, min(100, market.total_nb_stock[asset])), random.randint(1, 5))
-            else:
-                asset = random.choice(list(s_assets.keys()))
-                # On ne vend pas une qté > à celle qu'on peut vendre, et jamais plus que 100.
-                return LimitOrder(asset, self, 'ASK', price, random.randint(1, min(100,s_assets[asset])), random.randint(1, 5))
-        else:
-            # On ne peut rien vendre -> on achète
-            asset = random.choice(self.available_assets)
-            return LimitOrder(asset, self, 'BID', price, random.randint(1, min(100, market.total_nb_stock[asset])), random.randint(1, 5))
-
-
-class ZITTraderWithNegQty(Trader):
     def __str__(self):
         return "ZIT " + super().__str__()
     def place_order(self, market):
@@ -138,44 +136,28 @@ class OrderBook:
         self.last_transaction = None
     def __str__(self):
         Asks = "" ; Bids = ""
-        l_a = [o for o in self.asks.tree if o.time_to_live == None or o.time_to_live > 0] ; l_a.sort(key=(lambda x: x.price))
-        l_b = [o for o in self.bids.tree if o.time_to_live == None or o.time_to_live > 0] ; l_b.sort(key=(lambda x: -x.price))
+        l_a = self.asks.tree[:] ; l_a.sort(key=(lambda x: x.price))
+        l_b = self.bids.tree[:] ; l_b.sort(key=(lambda x: -x.price))
         for order in l_a:
-            Asks += order.__str__()+"\n"
+            Asks += "\t"+order.__str__()+"\n"
         for order in l_b:
-            Bids += order.__str__()+"\n"
-        return "OrderBook "+self.name+":\nAsks:\n"+Asks+"Bids:\n"+Bids
+            Bids += "\t"+order.__str__()+"\n"
+        return "\nOrderBook "+self.name+":\nAsks:\n"+(Asks if Asks != "" else "\tEmpty\n")+"Bids:\n"+(Bids if Bids != "" else "\tEmpty\n")+"\n"
     def add_order(self, order, market):
         if order.direction == "BID":
             self.add_bid(order)
         else:
             self.add_ask(order)
+        market.nb_order_sent += 1
         lst = order.attribute_list()
-        if lst[-1] == None:
-            market.out.write("Order;%s;%s;%s;%i;%i\n" % tuple(lst[:-1]))
-        else:
-            market.out.write("Order;%s;%s;%s;%i;%i;%i\n" % tuple(lst))
+        market.out.write("Order;%s;%s;%s;%i;%i\n" % tuple(lst))
         while self.match(order.direction, market) != None:
             pass
     def add_bid(self, order):
         self.bids.insert(order)
     def add_ask(self, order):
         self.asks.insert(order)
-        order.source.invested_assets[self.name] += order.qty
-    def decrease_life(self):
-        for order in self.asks.tree:
-            order.decrease_life()
-        for order in self.bids.tree:
-            order.decrease_life()
-        # On a diminué la vie de chaque ordre. Dans l'idéal, il faudrait virer tous les ordres "morts" (time_to_live = 0), mais la structure adoptée pour asks et bids
-        # (tas binaires) fait que ce n'est pas faisable de façon efficaces : les ordres morts peuvent être n'import où dans le tas...
-        # A la place, quand on va faire un match, on va retirer tous les ordres morts sur lesquels on tombe quand on va prendre le plus petit élement des tas...
     def match(self, dir, market): # Si une transaction est possible, l'effectue, sachant que le dernier ordre ajouté a pour direction dir. Sinon, retourne None.
-        while self.asks.size > 0 and self.asks.root().is_dead():
-            ask = self.asks.extract_root()
-            ask.source.invested_assets[self.name] -= ask.qty
-        while self.bids.size > 0 and self.bids.root().is_dead():
-            self.bids.extract_root()
         if (self.asks.size == 0) or (self.bids.size == 0):
             return None
         if self.asks.root().price > self.bids.root().price:
@@ -193,17 +175,18 @@ class OrderBook:
         # On modifie les agents
         ask.source.add_money(price*qty)
         ask.source.add_assets(self.name, -qty)
-        ask.source.invested_assets[self.name] -= qty
         bid.source.add_money(-price*qty)
         bid.source.add_assets(self.name, qty)
         self.last_transaction = (bid.source, ask.source, price, qty)
         market.prices[self.name] = price
         # On affiche le prix
         market.out.write("Price;%s;%s;%s;%i;%i\n" % (self.name, bid.source.__str__(), ask.source.__str__(), price, qty))
+        market.nb_fixed_price += 1
         # On affiche les agents qui ont été modifiés
-        market.out.write("Agent;%s;%i;%s;%i\n" % (ask.source.__str__(), ask.source.money, self.name, ask.source.assets[self.name]))
-        if ask.source != bid.source: # Pour ne pas afficher deux fois la même ligne si l'agent ayant émis le ask et celui ayant émis le bid est le même.
-            market.out.write("Agent;%s;%i;%s;%i\n" % (bid.source.__str__(), bid.source.money, self.name, bid.source.assets[self.name]))
+        if market.print_agent:
+            market.out.write("Agent;%s;%i;%s;%i\n" % (ask.source.__str__(), ask.source.money, self.name, ask.source.assets[self.name]))
+            if ask.source != bid.source: # Pour ne pas afficher deux fois la même ligne si l'agent ayant émis le ask et celui ayant émis le bid est le même.
+                market.out.write("Agent;%s;%i;%s;%i\n" % (bid.source.__str__(), bid.source.money, self.name, bid.source.assets[self.name]))
         return self.last_transaction
 
 
@@ -212,29 +195,28 @@ class Market:
         self.time = 0
         self.traders = []
         self.orderbooks = dict()
-        self.total_nb_stock = dict()
         self.prices = dict()
         self.out = sys.stdout if out == None else out
         self.print_ob = print_orderbooks
+        self.print_agent = True
+        self.nb_order_sent = 0
+        self.nb_fixed_price = 0
+        self.out.write("# Order;asset;agent;direction;price;qty\n# Tick;nb_tick\n# or Tick;nb_tick;asset;last_price\n# Price;asset;bider;asker;price;qty\n# Agent;name;money;last_modified_asset;qty\n\n")
     def __str__(self):
         return "Market with %i traders on assets: %s" % (len(self.traders), str(self.orderbooks.keys()))
     def add_asset(self, orderbook):
         self.orderbooks[orderbook.name] = orderbook
         self.prices[orderbook.name] = None
-        self.total_nb_stock[orderbook.name] = 0
     def remove_asset(self, orderbook):
         self.orderbooks.pop(orderbook.name, None)
         self.prices.pop(orderbook.name, None)
-        self.total_nb_stock.pop(orderbook.name, None)
     def add_trader(self, trader):
         if not trader in self.traders:
             self.traders.append(trader)
-        for asset in self.total_nb_stock.keys():
-            self.total_nb_stock[asset] += trader.assets[asset]
     def remove_trader(self, trader):
         self.traders.remove(trader)
-        for asset in self.total_nb_stock.keys():
-            self.total_nb_stock[asset] -= trader.assets[asset]
+    def print_state(self):
+        self.out.write("\n# Nb orders received: %i\n# Nb fixed prices: %i\n# Leaving ask size: %i\n# Leaving bid size: %i\n" % (self.nb_order_sent, self.nb_fixed_price, sum([self.orderbooks[asset].asks.size for asset in self.orderbooks.keys()]), sum([self.orderbooks[asset].bids.size for asset in self.orderbooks.keys()])))
     def update_time(self):
         self.time += 1
         at_least_one_price = False
@@ -244,9 +226,8 @@ class Market:
                 self.out.write("Tick;%i;%s;%i\n" % (self.time, asset, self.prices[asset]))
         if not(at_least_one_price):
             self.out.write("Tick;%i\n" % self.time)
-        for ob in self.orderbooks.keys():
-            self.orderbooks[ob].decrease_life()
-            if self.print_ob:
+        if self.print_ob:
+            for ob in self.orderbooks.keys():
                 self.out.write(self.orderbooks[ob].__str__())
     def run_once(self):
         random.shuffle(self.traders)
@@ -256,12 +237,21 @@ class Market:
                 if decision.asset in self.orderbooks:
                     self.orderbooks[decision.asset].add_order(decision, self)
         self.update_time()
-    def replay(self, order_list):
-        '''Run a list of orders of the form (asset, direction, price, qty).'''
+    def replay(self, filename):
+        '''Run a list of orders of the form Order;asset;direction;price;qty).'''
         t = Trader(self.orderbooks.keys())
-        m.add_trader(t)
-        for o in order_list:
-            self.time += 1
-            asset, direction, price, qty = o
-            order = LimitOrder(asset, t, direction, price, qty)
-            self.orderbooks[asset].add_order(order, self)
+        self.print_agent = False
+        self.add_trader(t)
+        with open(filename, 'r') as file:
+            for line in file:
+                l = line.split(";")
+                if l[0] == "Order":
+                    self.orderbooks[l[1]].add_order(LimitOrder(l[1], t, l[2], int(l[3]), int(l[4])), self)
+        self.print_agent = True
+    def generate(self, assets, nb_agent, nb_turn):
+        for asset in assets:
+            self.add_asset(OrderBook(asset))
+        for i in range(nb_agent):
+            self.add_trader(ZITTrader(assets))
+        for i in range(nb_turn):
+            self.run_once()

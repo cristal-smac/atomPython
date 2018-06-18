@@ -28,7 +28,7 @@ class MinHeap():
 				return l[0]
 			return 2*i+1 if self.fun(self.tree[2*i+1]) <= self.fun(self.tree[2*i+2]) else 2*i+2
 		if 2*i+1 < self.size:
-			return 2*i+1 if self.fun(self.tree[2*i+1]) > self.fun(self.tree[i]) else None
+			return 2*i+1 if self.fun(self.tree[2*i+1]) < self.fun(self.tree[i]) else None
 		else:
 			return None
 	def extract_root(self):
