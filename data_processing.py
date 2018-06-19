@@ -45,7 +45,7 @@ def process_wealth(filename):
 	Traders = []
 	Prices = dict()
 	Wealth = dict()
-	Traders_money = dict()
+	Traders_cash = dict()
 	Traders_available_assets = dict()
 	Traders_assets = dict() # Clés: (agent, asset)
 	last_line_type = "" # Stocke le type de la dernière ligne lue
@@ -59,7 +59,7 @@ def process_wealth(filename):
 				Prices[l[2]] = int(l[3])
 			elif last_line_type == "Tick" and last_line_len == 4 and l[0] != "Tick": # Si on a fini de lire chaque tick, et qu'il y a déjà eu des prix fixés
 				for t in Traders:
-					w = Traders_money[t]
+					w = Traders_cash[t]
 					for a in Traders_available_assets[t]:
 						w += Traders_assets[t, a]*int(Prices[a])
 					l_tick, l_wealth = Wealth[t]
@@ -70,7 +70,7 @@ def process_wealth(filename):
 					Traders.append(l[1])
 					Traders_available_assets[l[1]] = []
 					Wealth[l[1]] = [],[]
-				Traders_money[l[1]] = int(l[2])
+				Traders_cash[l[1]] = int(l[2])
 				if not l[3] in Traders_available_assets[l[1]]:
 					Traders_available_assets[l[1]].append(l[3])
 				Traders_assets[l[1], l[3]] = int(l[4])
