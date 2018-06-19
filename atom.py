@@ -190,8 +190,9 @@ class Market:
         if self.print_ob:
             for ob in self.orderbooks.keys():
                 self.out.write(self.orderbooks[ob].__str__())
-    def run_once(self):
-        random.shuffle(self.traders)
+    def run_once(self, suffle=True):
+        if suffle:
+            random.shuffle(self.traders)
         for t in self.traders:
             decision = t.place_order(self)
             if decision != None:
