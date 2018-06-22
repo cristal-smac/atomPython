@@ -23,19 +23,30 @@ import binary_heap as bh
 from data_processing import *
 
 
-class LimitOrder:
-    def __init__(self, asset, source, direction, price, qty):
+class Order:
+    def __init__(self, asset, source):
         self.asset = asset
         self.source = source
+
+class LimitOrder(Order):
+    def __init__(self, asset, source, direction, price, qty):
+        Order.__init__(self, asset, source)
         self.price = price
         self.direction = direction.upper()
         self.qty = qty
+        self.canceled = False
     def __str__(self):
-        return "%s %s at %.2f x %i from %s" % (self.direction, self.asset, self.price, self.qty, self.source.__str__())
+        return "LimitOrder;%s;%s;%s;%i;%i" % (self.asset, self.source.__str__(), self.direction, self.price, self.qty)
     def decrease_qty(self, q):
         self.qty -= q
     def attribute_list(self):
         return [self.asset, self.source.__str__(), self.direction, self.price, self.qty]
+    def cancel(self):
+        self.canceled = True
+
+class CancelOrder(Order):
+    def __str__(self):
+        return "CancelOrder;%s;%s" % (self.asset, self.source.__str__())
 
 
 class Trader(object):
@@ -101,20 +112,33 @@ class OrderBook:
             Bids += "\t"+order.__str__()+"\n"
         return "\nOrderBook "+self.name+":\nAsks:\n"+(Asks if Asks != "" else "\tEmpty\n")+"Bids:\n"+(Bids if Bids != "" else "\tEmpty\n")+"\n"
     def add_order(self, order, market):
-        if order.direction == "BID":
-            self.add_bid(order)
-        else:
-            self.add_ask(order)
         market.nb_order_sent += 1
-        lst = order.attribute_list()
-        market.out.write("Order;%s;%s;%s;%i;%i\n" % tuple(lst))
-        while self.match(order.direction, market) != None:
-            pass
+        if type(order).__name__ == 'LimitOrder':
+            if order.direction == "BID":
+                self.add_bid(order)
+            else:
+                self.add_ask(order)
+            while self.match(order.direction, market) != None:
+                pass
+        elif type(order).__name__ == 'CancelOrder':
+            for o in self.asks.tree:
+                if o.source == order.source:
+                    o.cancel()
+            for o in self.bids.tree:
+                if o.source == order.source:
+                    o.cancel()
+        market.out.write(order.__str__()+"\n")
     def add_bid(self, order):
         self.bids.insert(order)
     def add_ask(self, order):
         self.asks.insert(order)
+    def has_order_from(self, source):
+        return source in [o.source for o in self.bids.tree]+[o.source for o in self.asks.tree]
     def match(self, dir, market): # Si une transaction est possible, l'effectue, sachant que le dernier ordre ajouté a pour direction dir. Sinon, retourne None.
+        while self.asks.size > 0 and self.asks.root().canceled:
+            self.asks.extract_root()
+        while self.bids.size > 0 and self.bids.root().canceled:
+            self.bids.extract_root()
         if (self.asks.size == 0) or (self.bids.size == 0):
             return None
         if self.asks.root().price > self.bids.root().price:
@@ -159,7 +183,7 @@ class Market:
         self.print_agent = True
         self.nb_order_sent = 0
         self.nb_fixed_price = 0
-        self.out.write("# Order;asset;agent;direction;price;qty\n# Tick;nb_tick\n# or Tick;nb_tick;asset;last_price\n# Price;asset;bider;asker;price;qty\n# Agent;name;cash;last_modified_asset;qty\n\n")
+        self.out.write("# LimitOrder;asset;agent;direction;price;qty\n# CancelOrder;asset;agent\n# Tick;nb_tick\n# or Tick;nb_tick;asset;last_price\n# Price;asset;bider;asker;price;qty\n# Agent;name;cash;last_modified_asset;qty\n\n")
     def __str__(self):
         return "Market with %i traders on assets: %s" % (len(self.traders), str(self.orderbooks.keys()))
     def add_asset(self, orderbook):
@@ -210,10 +234,10 @@ class Market:
                 if l[0] == "Order":
                     self.orderbooks[l[1]].add_order(LimitOrder(l[1], t, l[2], int(l[3]), int(l[4])), self)
         self.print_agent = True
-    def generate(self, assets, nb_agent, nb_turn):
+    def generate(self, assets, nb_agent, nb_turn, init_assets=0):
         for asset in assets:
             self.add_asset(OrderBook(asset))
         for i in range(nb_agent):
-            self.add_trader(ZITTrader(assets))
+            self.add_trader(ZITTrader(assets, [init_assets]*len(assets)))
         for i in range(nb_turn):
             self.run_once()
