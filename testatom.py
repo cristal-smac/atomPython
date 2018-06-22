@@ -5,11 +5,7 @@ from atom import *
 m = Market(print_orderbooks=True)
 m.add_asset(OrderBook('Apple'))
 
-for i in range(2):
-    t = ZITTrader(['Apple'])
-    m.add_trader(t)
-for i in range(5):
-    m.run_once()
+m.generate(['Apple'],2,5)
 
 m.print_state()
 
