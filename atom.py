@@ -234,10 +234,10 @@ class Market:
                 if l[0] == "Order":
                     self.orderbooks[l[1]].add_order(LimitOrder(l[1], t, l[2], int(l[3]), int(l[4])), self)
         self.print_agent = True
-    def generate(self, assets, nb_agent, nb_turn):
+    def generate(self, assets, nb_agent, nb_turn, init_assets=0):
         for asset in assets:
             self.add_asset(OrderBook(asset))
         for i in range(nb_agent):
-            self.add_trader(ZITTrader(assets))
+            self.add_trader(ZITTrader(assets, [init_assets]*len(assets)))
         for i in range(nb_turn):
             self.run_once()

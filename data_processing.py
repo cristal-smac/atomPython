@@ -41,6 +41,7 @@ def process_returns_hist(filename, asset, nb_pts):
 	return (R, D, N)
 
 def process_wealth(filename):
+	# Cette fonction considère que si aucun prix n'a été fixé, alors le prix actuel de l'asset est de 0.
 	current_tick = 0
 	Traders = []
 	Prices = dict()
@@ -57,7 +58,8 @@ def process_wealth(filename):
 				# On stocke chaque prix fixé
 				current_tick = int(l[1])
 				Prices[l[2]] = int(l[3])
-			elif last_line_type == "Tick" and last_line_len == 4 and l[0] != "Tick": # Si on a fini de lire chaque tick, et qu'il y a déjà eu des prix fixés
+			elif last_line_type == "Tick" and last_line_len == 4 and l[0] != "Tick":
+			# Si on a fini de lire chaque tick, et qu'il y a déjà eu des prix fixés
 				for t in Traders:
 					w = Traders_cash[t]
 					for a in Traders_available_assets[t]:
