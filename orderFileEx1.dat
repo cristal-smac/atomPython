@@ -1,16 +1,15 @@
-# Order;asset;direction;price;qty
-
-Order;LVMH;BID;45500;13
-Order;LVMH;BID;42000;14
-Order;LVMH;ASK;12000;10
-Order;LVMH;BID;45800;17
-Order;LVMH;ASK;11500;10
-Order;LVMH;ASK;36000;12
-Order;LVMH;ASK;38500;12
-Order;LVMH;BID;34000;34
-Order;LVMH;ASK;19000;18
-Order;LVMH;ASK;11700;11
-Order;LVMH;ASK;24000;5
+NewAgent;Agent 1;0;LVMH;0
+LimitOrder;LVMH;Agent 1;BID;45500;13
+LimitOrder;LVMH;Agent 1;BID;42000;14
+LimitOrder;LVMH;Agent 1;ASK;12000;10
+LimitOrder;LVMH;Agent 1;BID;45800;17
+LimitOrder;LVMH;Agent 1;ASK;11500;10
+LimitOrder;LVMH;Agent 1;ASK;36000;12
+LimitOrder;LVMH;Agent 1;ASK;38500;12
+LimitOrder;LVMH;Agent 1;BID;34000;34
+LimitOrder;LVMH;Agent 1;ASK;19000;18
+LimitOrder;LVMH;Agent 1;ASK;11700;11
+LimitOrder;LVMH;Agent 1;ASK;24000;5
 
 # At the end, the orderbook is empty
 # Prices and Qty obtained:

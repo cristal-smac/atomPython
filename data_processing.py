@@ -17,12 +17,26 @@ def process_prices_per_tick(filename):
 					Prices[asset] = [int(l[1])], [int(l[3])]
 	return Prices
 
+def process_prices_per_timestamp(filename):
+	Prices = dict()
+	with open(filename, 'r') as file:
+		for line in file:
+			l = line.split(';')
+			if l[0] == "Price":
+				if l[1] in Prices.keys():
+					T, P = Prices[l[1]]
+					T.append(int(l[6]))
+					P.append(int(l[4]))
+				else:
+					Prices[l[1]] = [int(l[6])], [int(l[4])]
+	return Prices
+
 def process_prices(filename, asset):
 	Prices = []
 	with open(filename, 'r') as file:
 		for line in file:
 			l = line.split(';')
-			if l[0] == "Price" and l[1] == asset: # On ne s'intéresse qu'aux lignes de la forme Price;<asset>;Bider;Asker;Prix;Qté
+			if l[0] == "Price" and l[1] == asset: # On ne s'intéresse qu'aux lignes de la forme Price;<asset>;Bider;Asker;Prix;Qté;Timestamp
 				Prices.append(int(l[4]))
 	return Prices
 
