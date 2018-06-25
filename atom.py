@@ -110,14 +110,17 @@ class OrderBook:
             Asks += "\t"+order.__str__()+"\n"
         for order in l_b:
             Bids += "\t"+order.__str__()+"\n"
-        return "\nOrderBook "+self.name+":\nAsks:\n"+(Asks if Asks != "" else "\tEmpty\n")+"Bids:\n"+(Bids if Bids != "" else "\tEmpty\n")+"\n"
+        return "OrderBook "+self.name+":\nAsks:\n"+(Asks if Asks != "" else "\tEmpty\n")+"Bids:\n"+(Bids if Bids != "" else "\tEmpty\n")
     def add_order(self, order, market):
         market.nb_order_sent += 1
+        market.out.write(order.__str__()+"\n")
         if type(order).__name__ == 'LimitOrder':
             if order.direction == "BID":
                 self.add_bid(order)
             else:
                 self.add_ask(order)
+            if market.print_ob:
+                market.out.write(market.orderbooks[self.name].__str__())
             while self.match(order.direction, market) != None:
                 pass
         elif type(order).__name__ == 'CancelOrder':
@@ -127,7 +130,6 @@ class OrderBook:
             for o in self.bids.tree:
                 if o.source == order.source:
                     o.cancel()
-        market.out.write(order.__str__()+"\n")
     def add_bid(self, order):
         self.bids.insert(order)
     def add_ask(self, order):
@@ -162,6 +164,8 @@ class OrderBook:
         market.prices[self.name] = price
         # On affiche le prix
         market.out.write("Price;%s;%s;%s;%i;%i\n" % (self.name, bid.source.__str__(), ask.source.__str__(), price, qty))
+        if market.print_ob:
+            market.out.write(market.orderbooks[self.name].__str__())
         market.nb_fixed_price += 1
         # On affiche les agents qui ont été modifiés
         if market.print_agent:
@@ -211,9 +215,6 @@ class Market:
                 self.all_prices[asset].append(self.prices[asset])
         if not(at_least_one_price):
             self.out.write("Tick;%i\n" % self.time)
-        if self.print_ob:
-            for ob in self.orderbooks.keys():
-                self.out.write(self.orderbooks[ob].__str__())
     def run_once(self, suffle=True):
         if suffle:
             random.shuffle(self.traders)
