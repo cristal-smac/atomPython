@@ -17,12 +17,26 @@ def process_prices_per_tick(filename):
 					Prices[asset] = [int(l[1])], [int(l[3])]
 	return Prices
 
+def process_prices_per_timestamp(filename):
+	Prices = dict()
+	with open(filename, 'r') as file:
+		for line in file:
+			l = line.split(';')
+			if l[0] == "Price":
+				if l[1] in Prices.keys():
+					T, P = Prices[l[1]]
+					T.append(int(l[6]))
+					P.append(int(l[4]))
+				else:
+					Prices[l[1]] = [int(l[6])], [int(l[4])]
+	return Prices
+
 def process_prices(filename, asset):
 	Prices = []
 	with open(filename, 'r') as file:
 		for line in file:
 			l = line.split(';')
-			if l[0] == "Price" and l[1] == asset: # On ne s'intéresse qu'aux lignes de la forme Price;<asset>;Bider;Asker;Prix;Qté
+			if l[0] == "Price" and l[1] == asset: # On ne s'intéresse qu'aux lignes de la forme Price;<asset>;Bider;Asker;Prix;Qté;Timestamp
 				Prices.append(int(l[4]))
 	return Prices
 
@@ -41,11 +55,12 @@ def process_returns_hist(filename, asset, nb_pts):
 	return (R, D, N)
 
 def process_wealth(filename):
+	# Cette fonction considère que si aucun prix n'a été fixé, alors le prix actuel de l'asset est de 0.
 	current_tick = 0
 	Traders = []
 	Prices = dict()
 	Wealth = dict()
-	Traders_money = dict()
+	Traders_cash = dict()
 	Traders_available_assets = dict()
 	Traders_assets = dict() # Clés: (agent, asset)
 	last_line_type = "" # Stocke le type de la dernière ligne lue
@@ -57,9 +72,10 @@ def process_wealth(filename):
 				# On stocke chaque prix fixé
 				current_tick = int(l[1])
 				Prices[l[2]] = int(l[3])
-			elif last_line_type == "Tick" and last_line_len == 4 and l[0] != "Tick": # Si on a fini de lire chaque tick, et qu'il y a déjà eu des prix fixés
+			elif last_line_type == "Tick" and last_line_len == 4 and l[0] != "Tick":
+			# Si on a fini de lire chaque tick, et qu'il y a déjà eu des prix fixés
 				for t in Traders:
-					w = Traders_money[t]
+					w = Traders_cash[t]
 					for a in Traders_available_assets[t]:
 						w += Traders_assets[t, a]*int(Prices[a])
 					l_tick, l_wealth = Wealth[t]
@@ -70,7 +86,7 @@ def process_wealth(filename):
 					Traders.append(l[1])
 					Traders_available_assets[l[1]] = []
 					Wealth[l[1]] = [],[]
-				Traders_money[l[1]] = int(l[2])
+				Traders_cash[l[1]] = int(l[2])
 				if not l[3] in Traders_available_assets[l[1]]:
 					Traders_available_assets[l[1]].append(l[3])
 				Traders_assets[l[1], l[3]] = int(l[4])
