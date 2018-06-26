@@ -210,7 +210,7 @@ class Market:
         self.nb_fixed_price = 0
         self.init_price = init_price
         self.hist_len = hist_len
-        self.write("# LimitOrder;asset;agent;direction;price;qty\n# CancelMyOrders;asset;agent\n# Tick;nb_tick\n# or Tick;nb_tick;asset;last_price\n# Price;asset;bider;asker;price;qty;timestamp(µs)\n# NewAgent;name;cash;asset 1:qty 1,...,asset n:qty n\n# Agent;name;cash;last_modified_asset;qty\n# AgentWealth;agent;wealth;timestamp(µs)\n\n")
+        self.write("# LimitOrder;asset;agent;direction;price;qty\n# CancelMyOrders;asset;agent\n# Tick;nb_tick\n# Price;asset;bider;asker;price;qty;timestamp(µs)\n# NewAgent;name;cash;asset 1:qty 1,...,asset n:qty n\n# Agent;name;cash;last_modified_asset;qty\n# AgentWealth;agent;wealth;timestamp(µs)\n\n")
         for asset in list_assets:
             orderbook = OrderBook(asset)
             self.orderbooks[orderbook.name] = orderbook
@@ -237,16 +237,12 @@ class Market:
         self.write("\n# Nb orders received: %i\n# Nb fixed prices: %i\n# Leaving ask size: %i\n# Leaving bid size: %i\n" % (self.nb_order_sent, self.nb_fixed_price, sum([self.orderbooks[asset].asks.size for asset in self.orderbooks.keys()]), sum([self.orderbooks[asset].bids.size for asset in self.orderbooks.keys()])))
     def update_time(self):
         self.time += 1
-        at_least_one_price = False
         for asset in self.orderbooks.keys():
             if self.prices[asset] != None:
-                at_least_one_price = True
-                self.write("Tick;%i;%s;%i\n" % (self.time, asset, self.prices[asset]))
                 self.prices_hist[asset].append(self.prices[asset])
                 if len(self.prices_hist[asset]) > self.hist_len:
                     self.prices_hist[asset].pop(0)
-        if not(at_least_one_price):
-            self.write("Tick;%i\n" % self.time)
+        self.write("Tick;%i\n" % self.time)
     def run_once(self, suffle=True):
         if suffle:
             random.shuffle(self.traders)
@@ -269,14 +265,11 @@ class Market:
             for line in file:
                 l = line.split(';')
                 if l[0] == 'NewAgent':
-                    if l[3] not in self.orderbooks.keys(): # On rajoute l'asset si on ne le connait pas
-                        self.add_asset(OrderBook(l[3]))
-                    if l[1] not in traders.keys(): # Si on ne connait pas l'agent, on le rajoute
-                        t = Trader([l[3]], [int(l[4])], int(l[2]))
-                        traders[l[1]] = t
-                        self.add_trader(t)
-                    else: # Si on connait l'agent, on lui rend l'asset disponible
-                        traders[l[1]].make_available(l[3], self, int(l[4]))
+                    ias = l[3].split(',') # Liste des strings initial assets
+                    ia = [int(ias[i].split(':')[1]) for i in range(len(ias))]
+                    t = Trader(self, ia, int(l[2]))
+                    traders[l[1]] = t
+                    self.add_trader(t)
                 elif l[0] == 'LimitOrder':
                     self.orderbooks[l[1]].add_order(LimitOrder(l[1], traders[l[2]], l[3], int(l[4]), int(l[5])), self)
                 elif l[0] == 'CancelMyOrders':
