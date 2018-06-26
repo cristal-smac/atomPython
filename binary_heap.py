@@ -1,3 +1,5 @@
+import numpy as np
+
 class MinHeap():
 	''' Tas min '''
 	def __init__(self, fun):
@@ -54,4 +56,4 @@ class MaxHeap(MinHeap):
 	def __init__(self, fun):
 		self.tree = []
 		self.size = 0
-		self.fun = lambda x: -fun(x)
+		self.fun = lambda x: tuple(np.multiply(-1,fun(x)))

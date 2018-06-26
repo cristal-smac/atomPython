@@ -2,22 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 
-def process_prices_per_tick(filename):
-	Prices = dict()
-	with open(filename, 'r') as file:
-		for line in file:
-			l = line.split(';')
-			if l[0] == "Tick" and len(l) == 4: # On ne s'intéresse qu'aux lignes de la forme Tick;Tick_number;Asset;Price
-				asset = l[2]
-				if asset in Prices.keys(): # Si on a déjà croisé l'asset, on ajoute le temps et le prix dans notre liste
-					T, P = Prices[asset]
-					T.append(int(l[1]))
-					P.append(int(l[3]))
-				else:
-					Prices[asset] = [int(l[1])], [int(l[3])]
-	return Prices
-
-def process_prices_per_timestamp(filename):
+def extract_prices(filename):
 	Prices = dict()
 	with open(filename, 'r') as file:
 		for line in file:
@@ -31,14 +16,23 @@ def process_prices_per_timestamp(filename):
 					Prices[l[1]] = [int(l[6])], [int(l[4])]
 	return Prices
 
-def process_prices(filename, asset):
-	Prices = []
+def extract_wealths(filename):
+	Wealths = dict()
 	with open(filename, 'r') as file:
 		for line in file:
 			l = line.split(';')
-			if l[0] == "Price" and l[1] == asset: # On ne s'intéresse qu'aux lignes de la forme Price;<asset>;Bider;Asker;Prix;Qté;Timestamp
-				Prices.append(int(l[4]))
-	return Prices
+			if l[0] == "AgentWealth":
+				if l[1] in Wealths.keys():
+					T, W = Wealths[l[1]]
+					T.append(int(l[3]))
+					W.append(int(l[2]))
+				else:
+					Wealths[l[1]] = [int(l[3])], [int(l[2])]
+	return Wealths
+
+# ----------------------- #
+# La suite est à modifier #
+# ----------------------- #
 
 def process_returns_hist(filename, asset, nb_pts):
 	Prices = np.array(process_prices(filename, asset))
