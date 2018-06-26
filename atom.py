@@ -66,7 +66,7 @@ class Trader(object):
             self.assets[asset] = initial_assets[list(market.orderbooks.keys()).index(asset)]
     def __str__(self):
         return str(self.trader_id)
-    def decide_order(self, market):
+    def decide_order(self, market, asset):
         raise NotImplementedException
     def add_cash(self, n):
         self.cash += n
@@ -186,10 +186,11 @@ class OrderBook:
         market.nb_fixed_price += 1
         # On affiche les agents qui ont été modifiés
         market.write("Agent;%s;%i;%s;%i;%i\n" % (ask.source.__str__(), ask.source.cash, self.name, ask.source.assets[self.name], int(time.time()*1000000-market.t0)))
-        market.write("AgentWealth;%s;%i;%i\n" % (ask.source.__str__(), ask.source.get_wealth(market), int(time.time()*1000000-market.t0)))
         if ask.source != bid.source: # Pour ne pas afficher deux fois la même ligne si l'agent ayant émis le ask et celui ayant émis le bid est le même.
             market.write("Agent;%s;%i;%s;%i;%i\n" % (bid.source.__str__(), bid.source.cash, self.name, bid.source.assets[self.name], int(time.time()*1000000-market.t0)))
-            market.write("AgentWealth;%s;%i;%i\n" % (bid.source.__str__(), bid.source.get_wealth(market), int(time.time()*1000000-market.t0)))
+        # À chaque fois qu'un prix est fixé, le wealth de TOUS les agents est modifié. On les affiche donc tous.
+        for agent in market.traders:
+            market.write("AgentWealth;%s;%i;%i\n" % (agent.__str__(), agent.get_wealth(market), int(time.time()*1000000-market.t0)))
         return self.last_transaction
 
 
@@ -235,6 +236,9 @@ class Market:
         self.traders.remove(trader)
     def print_state(self):
         self.write("\n# Nb orders received: %i\n# Nb fixed prices: %i\n# Leaving ask size: %i\n# Leaving bid size: %i\n" % (self.nb_order_sent, self.nb_fixed_price, sum([self.orderbooks[asset].asks.size for asset in self.orderbooks.keys()]), sum([self.orderbooks[asset].bids.size for asset in self.orderbooks.keys()])))
+    def print_last_prices(self):
+        for asset in self.orderbooks.keys():
+            self.write("Price;%s;None;None;%i;None;%i\n" % (asset, self.prices[asset], int(time.time()*1000000-self.t0)))
     def update_time(self):
         self.time += 1
         for asset in self.orderbooks.keys():
