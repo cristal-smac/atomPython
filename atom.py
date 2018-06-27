@@ -16,7 +16,6 @@
 import time
 import random
 import sys
-import numpy as np
 
 import binary_heap as bh
 from data_processing import *
@@ -119,7 +118,7 @@ class OrderBook:
     def __init__(self, name):
         self.name = name
         self.asks = bh.MinHeap(lambda x: (x.price, x.time))
-        self.bids = bh.MaxHeap(lambda x: (x.price, -x.time))
+        self.bids = bh.MinHeap(lambda x: (-x.price, x.time))
         self.last_transaction = None
     def __str__(self):
         Asks = "" ; Bids = ""
