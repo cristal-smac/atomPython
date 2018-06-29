@@ -39,8 +39,6 @@ class LimitOrder(Order):
         return "LimitOrder;%s;%s;%s;%i;%i" % (self.asset, self.source.__str__(), self.direction, self.price, self.qty)
     def decrease_qty(self, q):
         self.qty -= q
-    def attribute_list(self):
-        return [self.asset, self.source.__str__(), self.direction, self.price, self.qty]
     def cancel(self):
         self.canceled = True
     def current_time(self, market):
