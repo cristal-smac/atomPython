@@ -18,7 +18,7 @@ import random
 import sys
 
 import binary_heap as bh
-from data_processing import *
+# from data_processing import *
 
 
 class Order:
@@ -113,11 +113,12 @@ class ZITTrader(Trader):
 
 
 class OrderBook:
-    def __init__(self, name):
+    def __init__(self, name, exo_info=(lambda x: 0)):
         self.name = name
         self.asks = bh.MinHeap(lambda x: (x.price, x.time))
         self.bids = bh.MinHeap(lambda x: (-x.price, x.time))
         self.last_transaction = None
+        self.exo_info = exo_info # Fonction N -> [-1,1] qui à un tick associe un indice de confiance dans le marché.
     def __str__(self):
         Asks = "" ; Bids = ""
         l_a = self.asks.tree[:] ; l_a.sort(key=(lambda x: (x.price, x.time)))
@@ -217,7 +218,7 @@ class OrderBook:
 
 
 class Market:
-    def __init__(self, list_assets, out=sys.stdout, trace='all except orderbooks', init_price=0, hist_len=100, fix='L'):
+    def __init__(self, list_assets, exo_infos=None, out=sys.stdout, trace='all except orderbooks', init_price=0, hist_len=100, fix='L'):
         # init_price : prix initial supposé des différents cours quand a aucun prix n'a encore été fixé (surtout utilisé pour le calcul du wealth)
         # hist_len : à un asset donné, nombre de prix gardés en mémoire par le marché
         self.t0 = time.time()*1000000
@@ -245,7 +246,7 @@ class Market:
         self.write("# Agent;name;cash;last_modified_asset;qty\n", i='agent')
         self.write("# AgentWealth;agent;wealth;timestamp(µs)\n", i='wealth')
         for asset in list_assets:
-            orderbook = OrderBook(asset)
+            orderbook = OrderBook(asset) if exo_infos == None else OrderBook(asset, exo_infos[list_assets.index(asset)])
             self.orderbooks[orderbook.name] = orderbook
             self.prices[orderbook.name] = None
             self.prices_hist[orderbook.name] = []
