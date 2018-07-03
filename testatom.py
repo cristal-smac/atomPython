@@ -1,60 +1,91 @@
 #!/usr/bin/python
 
 from atom import *
-from data_processing import *
-from math import cos, sin
+import random
+from copy import copy
+from math import log, sqrt, atan, tanh, pi
 
-class ZITTraderExo(Trader):
-	def __init__(self, market, initial_assets=None, cash=0, sensitivity=0):
+class AversionTrader(Trader):
+	def __init__(self, market, risk_aversion, initial_assets=None, cash=0):
 		Trader.__init__(self, market, initial_assets, cash)
-		self.sensitivity = sensitivity
+		self.risk_av = risk_aversion
+		self.last_sent_order = None
 	def __str__(self):
-		return "ZITExo %i" % self.trader_id
+		return "AversionTrader %i" % self.trader_id
+	def set_info(self, lower, upper):
+		self.lower = lower
+		self.upper = upper
+	def compute_state(self, market, asset):
+		pt = market.prices[asset]
+		invest_value = self.assets[asset]*pt
+		wealth = invest_value + self.cash
+		wa = invest_value/wealth
+		r_low = log(self.lower)-log(pt)
+		r_up = log(self.upper)-log(pt)
+		r_mean = (r_low+r_up)/2
+		r_var = (r_up-r_low)**2/12
+		wa_opt = r_mean/(self.risk_av*r_var)
+		wa_opt = tanh(r_mean/(risk_av*r_var))/2 +.5
+		#wa_opt = 0.6*atan(r_mean/(risk_av*r_var))/pi +.5
+		self.is_happy = abs((wa-wa_opt)/wa_opt) < .1
+		qty = int(round((wa_opt*wealth)/pt - self.assets[asset]))
+		if qty < 0:
+			self.dir = 'ASK'
+			self.qty = -qty
+		else:
+			self.dir = 'BID'
+			self.qty = qty
+	def notify(self, o1, o2):
+		self.last_sent_order = o2
 	def decide_order(self, market, asset):
-		r = random.random() # 0 <= r < 1
-		exo_info = market.orderbooks[asset].exo_info(market.time)
-		price_inf = 1000 if exo_info <= 0 else min(9999, 1000+int(round(exo_info*self.sensitivity)))
-		price_sup = 9999 if exo_info >= 0 else max(1000, 9999+int(round(exo_info*self.sensitivity)))
-		return LimitOrder(asset, self, random.choice(['ASK', 'BID']), random.randint(price_inf, price_sup), random.randint(1, 9))
+		if random.random() < .9:
+			return None
+		self.compute_state(market, asset)
+		if self.is_happy:
+			return None
+		price = random.randint(self.lower, self.upper)
+		if self.last_sent_order != None:
+			self.last_sent_order.cancel()
+		if self.dir == 'ASK':
+			self.qty = min(self.qty, self.assets[asset])
+		if self.dir == 'BID':
+			self.qty = min(self.qty, self.cash//market.prices[asset])
+		if self.qty <= 0:
+			return None
+		self.last_sent_order = LimitOrder(asset, self, self.dir, price, self.qty)
+		return self.last_sent_order
 
-class MichaelMilken(Trader):
-	'''Un charmant agent faisant des délits d'initié'''
-	def __str__(self):
-		return "Michael Milken"
-	def decide_order(self, market, asset):
-		r = random.random() # 0 <= r < 1
-		info = np.mean([market.orderbooks[asset].exo_info(i) for i in range(market.time, market.time+5)])
-		if info > .8 and market.orderbooks[asset].asks.size > 0:
-			return LimitOrder(asset, self, 'BID', market.orderbooks[asset].asks.root().price, int(10*info))
-		elif info < -.8 and market.orderbooks[asset].bids.size > 0:
-			return LimitOrder(asset, self, 'ASK', market.orderbooks[asset].bids.root().price, int(-10*info))
-		return None
+
+nb_days = 30
+nb_ticks = 30
+opening_price = 5100
+fund_value = 5000
 
 file = open('trace.dat', 'w')
-m = Market(['Google'], exo_infos=[(lambda x: sin(x/40))], out=file, trace=['price', 'wealth'], fix='L')
-for i in range(2):
-    m.add_trader(ZITTraderExo(m, initial_assets=[10], sensitivity=6000))
-t = MichaelMilken(m, initial_assets=[10])
-m.add_trader(t)
-for i in range(1256):
-    m.run_once()
+m = Market(['Google'], out=file, trace=['order', 'tick', 'price'], init_price=opening_price)
+m.print_last_prices()
+
+for i in range(500):
+	risk_av = random.randint(1, 10)
+	init_cash = (2000000*(10-risk_av))//9
+	init_invest = (2000000-init_cash)//opening_price
+	ag = AversionTrader(m, risk_av, [init_invest], init_cash)
+	ag.set_info(int(0.7*fund_value), int(1.3*fund_value))
+	m.add_trader(ag)
+
+for d in range(nb_days):
+	t = int(time.time()*1000000-m.t0)
+	m.write("LowerFundValue(New);%i;%i\nUpperFundValue(New);%i;%i\n" % (int(fund_value*0.7), t, int(fund_value*1.3), t))
+	for ag in m.traders:
+		ag.set_info(int(fund_value*0.7), int(fund_value*1.3))
+	for t in range(nb_ticks):
+	    m.run_once()
+	t = int(time.time()*1000000-m.t0)
+	m.write("LowerFundValue;%i;%i\nUpperFundValue;%i;%i\n" % (int(fund_value*0.7), t, int(fund_value*1.3), t))
+	x = random.randint(500,1000)
+	fund_value += x if fund_value <= 2000 else random.choice([-x, x])
+	m.print_last_prices()
+
+m.out = sys.stdout
+m.print_state()
 file.close()
-
-Wealths = extract_wealths('trace.dat')
-T, W = Wealths['Michael Milken']
-plt.plot(T, smooth(W, 10), '-', label="Michael Milken")
-W_total = None
-for agent in Wealths.keys():
-	if "ZIT" in agent:
-		T, W = Wealths[agent]
-		W = np.array(W)
-		W_total = W if type(W_total).__name__ == 'NoneType' else W_total + W
-W = W_total/(len(Wealths)-1)
-plt.plot(T, smooth(W, 10), '-', label="ZIT (mean)")
-plt.grid()
-plt.legend(loc='best')
-plt.xlabel('Time')
-plt.ylabel('Wealth')
-plt.show()
-
-print(t.get_infos(m))
