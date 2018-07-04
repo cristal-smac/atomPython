@@ -16,6 +16,23 @@ def extract_prices(filename):
 					Prices[l[1]] = [int(l[6])], [int(l[4])]
 	return Prices
 
+def extract_qties(filename):
+	T = []
+	Q = []
+	with open(filename, 'r') as file:
+		qty = 0
+		tick = 0
+		for line in file:
+			l = line.split(';')
+			if l[0] == "Tick":
+				tick += 1
+				T.append(tick)
+				Q.append(qty)
+				qty = 0
+			if l[0] == "Price" and l[5] != "None":
+				qty += int(l[5])
+	return T, Q
+
 def extract_wealths(filename):
 	Wealths = dict()
 	with open(filename, 'r') as file:
@@ -44,14 +61,14 @@ def draw_returns_hist(filename, asset, nb_pts, tau=1):
 	sigma = np.sqrt(np.mean((Returns-mu)**2))
 	N = scipy.stats.norm.pdf(R2, mu, sigma) # Loi normale de même espérance et écart-type que les rentabilités
 	X = ((R-mu)/sigma)**4
-	plt.semilogy(R, D, '-', label='Returns for tau = %i. Kurtosis = %.2f' % (tau, 3+scipy.stats.kurtosis(Returns)))
+	plt.semilogy(R, D, 'o', label='Returns for tau = %i. Kurtosis = %.2f' % (tau, 3+scipy.stats.kurtosis(Returns)))
 	plt.semilogy(R2, N, '--', label='Normal PDF')
 	plt.xlabel('Returns')
 	plt.ylabel('Density')
 	plt.legend(loc='best')
 	plt.title('Distribution of returns')
 	r = np.max(np.abs(R))*1.05
-	plt.axis([-r, r, 10**-3, max(D)*2])
+	# plt.axis([-r, r, 10**-3, max(D)*2])
 	plt.grid()
 	plt.show()
 
