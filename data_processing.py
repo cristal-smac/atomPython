@@ -68,7 +68,7 @@ def draw_returns_hist(filename, asset, nb_pts, tau=1):
 	plt.legend(loc='best')
 	plt.title('Distribution of returns')
 	r = np.max(np.abs(R))*1.05
-	# plt.axis([-r, r, 10**-3, max(D)*2])
+	plt.axis([-r, r, 10**-3, max(D)*2])
 	plt.grid()
 	plt.show()
 

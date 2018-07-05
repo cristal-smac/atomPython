@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 Prices = extract_prices('trace.dat')
 T, P = Prices['Google']
-plt.plot(T, P, '-', color='orange', label="Price")
+plt.plot(T, smooth(P,10), '-', color='orange', label="Price")
 plt.xlabel("Time")
 plt.ylabel("Price")
 
@@ -60,4 +60,52 @@ plt.show(block=False)
 
 plt.figure()
 
-draw_returns_hist('trace.dat', 'Google', 100)
+Wa = []
+WaOpt = []
+
+with open('trace.dat', 'r') as file:
+	for line in file:
+		l = line.split(';')
+		if l[0] == "Wa":
+			Wa.append(float(l[1]))
+			WaOpt.append(float(l[2]))
+
+plt.plot(Wa, '-', label="Wa")
+plt.plot(WaOpt, '-', label="Wa opt")
+plt.legend(loc='best')
+
+plt.show(block=True)
+
+# ------ #
+# Orders #
+# ------ #
+
+# plt.figure()
+
+# Ta = [] ; Tb = []
+# Pa = [] ; Pb = []
+
+# with open('trace.dat', 'r') as file:
+# 	for line in file:
+# 		l = line.split(';')
+# 		if l[0] == "LimitOrder":
+# 			if l[3] == 'ASK':
+# 				Ta.append(int(l[6]))
+# 				Pa.append(int(l[4]))
+# 			else:
+# 				Tb.append(int(l[6]))
+# 				Pb.append(int(l[4]))
+# plt.plot(Ta, Pa, 'o', color='blue')
+# plt.plot(Tb, Pb, 'o', color='red')
+# plt.xlabel('Time')
+# plt.ylabel('Price of LO')
+
+# plt.show(block=False)
+
+# ------------ #
+# Returns hist #
+# ------------ #
+
+# plt.figure()
+
+# draw_returns_hist('trace.dat', 'Google', 100)

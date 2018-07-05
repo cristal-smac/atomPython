@@ -3,7 +3,15 @@
 from atom import *
 import random
 from copy import copy
-from math import log, sqrt, atan, tanh, pi
+from math import log, sqrt, atan, tanh, pi, sin
+
+def sgn(x):
+	if x > 0:
+		return 1
+	elif x < 0:
+		return -1
+	else:
+		return 0
 
 class AversionTrader(Trader):
 	def __init__(self, market, risk_aversion, aggressiveness, initial_assets=None, cash=0):
@@ -21,15 +29,26 @@ class AversionTrader(Trader):
 		invest_value = self.assets[asset]*pt
 		wealth = invest_value + self.cash
 		wa = invest_value/wealth
-		r_low = log(self.lower)-log(pt)
-		r_up = log(self.upper)-log(pt)
-		r_mean = (r_low+r_up)/2
-		r_var = (r_up-r_low)**2/12
-		wa_opt = r_mean/(self.risk_av*r_var)
+		# r_low = log(self.lower)-log(pt)
+		# r_up = log(self.upper)-log(pt)
+		# r_mean = (r_low+r_up)/2
+		# r_var = (r_up-r_low)**2/12
+		#wa_opt = r_mean/(self.risk_av*r_var)
 		#wa_opt = tanh(r_mean/(risk_av*r_var))/2 +.5
-		wa_opt = atan(r_mean/(risk_av*r_var))/pi +.5
-		self.is_happy = abs((wa-wa_opt)/wa_opt) < .1
+		#wa_opt = atan(r_mean/(risk_av*r_var))/pi +.5
+		u = self.upper
+		l = self.lower
+		p = market.prices[asset]
+		epsilon = .1
+		eta = .05
+		Delta = (p-l)*(p-u)/((u-l)/2)**2 + 1+epsilon
+		self.Delta = Delta
+		Delta_tilde = (Delta-epsilon)*sgn((u+l)/2-p)/16 + .5
+		wa_opt = Delta_tilde + (5-self.risk_av)/20 + sin(p*market.time*self.aggressiveness)/10
+		self.is_happy = abs((wa-wa_opt)/wa_opt) < .04
 		qty = int(round((wa_opt*wealth)/pt - self.assets[asset]))
+		if self.trader_id == 1:
+			market.write("Wa;%.4f;%4f\n" % (wa, wa_opt))
 		if qty < 0:
 			self.dir = 'ASK'
 			self.qty = -qty
@@ -46,7 +65,11 @@ class AversionTrader(Trader):
 		# 	return None
 		if self.last_sent_order != None:
 			self.last_sent_order.cancel()
-		# price = random.randint(self.lower, self.upper)
+		price = random.randint(self.lower, self.upper)
+		# if self.dir == 'BID':
+		# 	price = (self.upper+self.lower)/2 + sqrt(self.Delta)*(self.upper-self.lower)*(self.aggressiveness/10-.5)
+		# elif self.dir == 'ASK':
+		# 	price = (self.upper+self.lower)/2 - sqrt(self.Delta)*(self.upper-self.lower)*(self.aggressiveness/10-.5)
 		# Prix déterministe :
 		# # Tentative 1
 		# # 1 - On vire les ordres annulés de l'orderbook
@@ -69,12 +92,12 @@ class AversionTrader(Trader):
 		# if self.dir == 'BID':
 		# 	price = int(bbt+3*instability*(self.upper-self.lower)*self.aggressiveness/30)
 		# Tentative 2
-		u = self.upper
-		l = self.lower
-		if self.dir == 'BID':
-			price = l + (self.aggressiveness*(u-l))//10
-		elif self.dir == 'ASK':
-			price = u - (self.aggressiveness*(u-l))//10
+		# u = self.upper
+		# l = self.lower
+		# if self.dir == 'BID':
+		# 	price = l + (self.aggressiveness*(u-l))//10
+		# elif self.dir == 'ASK':
+		# 	price = u - (self.aggressiveness*(u-l))//10
 		# On vérifie que l'agent n'a ni cash ni asset négatif
 		if self.dir == 'ASK':
 			self.qty = min(self.qty, self.assets[asset])
@@ -86,9 +109,9 @@ class AversionTrader(Trader):
 		return self.last_sent_order
 
 
-nb_days = 10
-nb_ticks = 1000
-opening_price = 5100
+nb_days = 200
+nb_ticks = 30
+opening_price = 5000
 fund_value = 5000
 
 file = open('trace.dat', 'w')
@@ -96,18 +119,20 @@ m = Market(['Google'], out=file, trace=['order', 'tick', 'price'], init_price=op
 m.print_last_prices()
 
 for i in range(500):
-	risk_av = random.randint(1, 10)
+	risk_av = random.randint(0, 10)
 	agrness = random.randint(0, 10)
-	init_cash = (2000000*(10-risk_av))//9
-	init_invest = (2000000-init_cash)//opening_price
+	# init_cash = (2000000*(10-risk_av))//10
+	# init_invest = (2000000-init_cash)//opening_price
+	init_cash = 1000000
+	init_invest = 1000000//opening_price
 	ag = AversionTrader(m, risk_av, agrness, [init_invest], init_cash)
 	m.add_trader(ag)
 
 for d in range(nb_days):
-	x_up = 1.1 + random.random()*.15
-	x_low = 0.9 - random.random()*.15
-	lower = int(x_low*fund_value)
-	upper = int(x_up*fund_value)
+	# x_up = 1.1 + random.random()*.15
+	# x_low = 0.9 - random.random()*.15
+	lower = int(0.7*fund_value)
+	upper = int(1.3*fund_value)
 	t = int(time.time()*10**9-m.t0)
 	m.write("Day;%i;%i;%i\n" % (d, t, m.time+1))
 	m.write("LowerFundValue;%i;%i\nFundValue;%i;%i\nUpperFundValue;%i;%i\n" % (lower, t, fund_value, t, upper, t))
@@ -117,7 +142,7 @@ for d in range(nb_days):
 	    m.run_once()
 	t = int(time.time()*10**9-m.t0)
 	m.write("LowerFundValue;%i;%i\nFundValue;%i;%i\nUpperFundValue;%i;%i\n" % (lower, t, fund_value, t, upper, t))
-	fund_value += random.gauss(0, 50)
+	fund_value = int(fund_value*(random.random()*0.21+0.9))
 	m.print_last_prices()
 
 m.out = sys.stdout

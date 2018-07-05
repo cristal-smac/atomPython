@@ -37,7 +37,7 @@ class LimitOrder(Order):
         self.time = None
         self.canceled = False
     def __str__(self):
-        return "LimitOrder;%s;%s;%s;%i;%i" % (self.asset, self.source.__str__(), self.direction, self.price, self.qty)
+        return "LimitOrder;%s;%s;%s;%i;%i;%i" % (self.asset, self.source.__str__(), self.direction, self.price, self.qty, self.time)
     def decrease_qty(self, q):
         self.qty -= q
     def cancel(self):
@@ -135,10 +135,10 @@ class OrderBook:
         return "OrderBook "+self.name+":\nAsks:\n"+(Asks if Asks != "" else "\tEmpty\n")+"Bids:\n"+(Bids if Bids != "" else "\tEmpty\n")
     def add_order(self, order, market):
         market.nb_order_sent += 1
-        if market.should_write('order'):
-            market.write(order.__str__()+"\n")
         if type(order).__name__ == 'LimitOrder':
             order.current_time(market)
+            if market.should_write('order'):
+                market.write(order.__str__()+"\n")
             if order.direction == "BID":
                 self.add_bid(order)
             else:
@@ -164,6 +164,8 @@ class OrderBook:
                 if market.should_write('orderbook'):
                     market.write(market.orderbooks[self.name].__str__())
         elif type(order).__name__ == 'CancelMyOrders':
+            if market.should_write('order'):
+                market.write(order.__str__()+"\n")
             for o in self.asks.tree+self.bids.tree:
                 if o.source == order.source:
                     o.cancel()
@@ -287,7 +289,8 @@ class Market:
     def print_state(self):
         ask_size = len([o for asset in self.orderbooks.keys() for o in self.orderbooks[asset].asks.tree if not o.canceled])
         bid_size = len([o for asset in self.orderbooks.keys() for o in self.orderbooks[asset].bids.tree if not o.canceled])
-        self.write("# Nb orders received: %i\n# Nb fixed prices: %i\n# Leaving ask size: %i\n# Leaving bid size: %i\n" % (self.nb_order_sent, self.nb_fixed_price, ask_size, bid_size))
+        self.write("# Nb orders received: %i\n# Nb fixed prices: %i\n# Leaving ask size: %i\n# Leaving bid size: %i\n# Is happy: %i\n" % (self.nb_order_sent, self.nb_fixed_price, ask_size, bid_size, len([t for t in self.traders if t.is_happy])))
+
     def print_last_prices(self):
         for asset in self.orderbooks.keys():
             self.write("Price;%s;None;None;%i;None;%i\n" % (asset, self.prices[asset], int(time.time()*10**9-self.t0)))
