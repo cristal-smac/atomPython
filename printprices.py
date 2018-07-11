@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 Prices = extract_prices('trace.dat')
 T, P = Prices['Google']
-plt.plot(T, smooth(P,10), '-', color='orange', label="Price")
+plt.plot(T, P, '-', color='orange', label="Price")
 plt.xlabel("Time")
 plt.ylabel("Price")
 
@@ -37,7 +37,6 @@ plt.plot(T, FV, '--k', label="Fund. value")
 plt.plot(T, L, ':k', label="Lower fund. value")
 
 plt.legend(loc='best')
-plt.show(block=False)
 
 # ---------- #
 # Quantities #
@@ -56,25 +55,7 @@ with open('trace.dat', 'r') as file:
 
 plt.xlabel('Tick')
 plt.ylabel('Sum of quantities')
-plt.show(block=False)
-
-plt.figure()
-
-Wa = []
-WaOpt = []
-
-with open('trace.dat', 'r') as file:
-	for line in file:
-		l = line.split(';')
-		if l[0] == "Wa":
-			Wa.append(float(l[1]))
-			WaOpt.append(float(l[2]))
-
-plt.plot(Wa, '-', label="Wa")
-plt.plot(WaOpt, '-', label="Wa opt")
-plt.legend(loc='best')
-
-plt.show(block=True)
+plt.show()
 
 # ------ #
 # Orders #

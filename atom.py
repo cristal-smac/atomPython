@@ -83,7 +83,7 @@ class Trader(object):
             s += asset+": "+str(self.assets[asset])+"\n"
         s += "Wealth: "+str(self.get_wealth(market))+"\n"
         return s
-    def notify(o1, o2):
+    def notify(self, o1, o2):
         pass
 
 
@@ -105,6 +105,9 @@ class ZITTrader(Trader):
         self.p_max = p_max
         self.q_min = q_min
         self.q_max = q_max
+    def set_info(self, l, u):
+        self.p_min = l 
+        self.p_max = u 
     def __str__(self):
         return "ZIT %i" % self.trader_id
     def decide_order(self, market, asset):
@@ -289,7 +292,7 @@ class Market:
     def print_state(self):
         ask_size = len([o for asset in self.orderbooks.keys() for o in self.orderbooks[asset].asks.tree if not o.canceled])
         bid_size = len([o for asset in self.orderbooks.keys() for o in self.orderbooks[asset].bids.tree if not o.canceled])
-        self.write("# Nb orders received: %i\n# Nb fixed prices: %i\n# Leaving ask size: %i\n# Leaving bid size: %i\n# Is happy: %i\n" % (self.nb_order_sent, self.nb_fixed_price, ask_size, bid_size, len([t for t in self.traders if t.is_happy])))
+        self.write("# Nb orders received: %i\n# Nb fixed prices: %i\n# Leaving ask size: %i\n# Leaving bid size: %i\n" % (self.nb_order_sent, self.nb_fixed_price, ask_size, bid_size))
 
     def print_last_prices(self):
         for asset in self.orderbooks.keys():
@@ -303,8 +306,8 @@ class Market:
                     self.prices_hist[asset].pop(0)
         if self.should_write('tick'):
             self.write("Tick;%i;%i\n" % (self.time, int(time.time()*10**9-self.t0)))
-    def run_once(self, suffle=True):
-        if suffle:
+    def run_once(self, shuffle=True):
+        if shuffle:
             random.shuffle(self.traders)
         # Au sein d'un tour, chaque agent a exactement une fois la possibilité d'envoyer un ordre pour chaque asset
         for t in self.traders:
