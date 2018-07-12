@@ -55,7 +55,6 @@ with open('trace.dat', 'r') as file:
 
 plt.xlabel('Tick')
 plt.ylabel('Sum of quantities')
-plt.show()
 
 # ------ #
 # Orders #
@@ -87,6 +86,8 @@ plt.show()
 # Returns hist #
 # ------------ #
 
-# plt.figure()
+plt.figure()
 
-# draw_returns_hist('trace.dat', 'Google', 100)
+draw_returns_hist('trace.dat', 'Google', 100)
+
+plt.show()

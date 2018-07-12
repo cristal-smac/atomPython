@@ -1,19 +1,17 @@
 from atom import *
-from numpy.random import normal
+from numpy.random import normal, laplace
 
 class Fundamentalist(Trader):
 	def __init__(self, market, aggressiveness, initial_assets=None, cash=0):
 		Trader.__init__(self, market, initial_assets, cash)
 		self.alpha = aggressiveness
+		self.epsilon = random.randint(0,1) # Détermine si on achète ou en vend en cas d'égalité entre l'écart de m aux best orders
 	def __str__(self):
 		return "Fundamentalist %i" % self.trader_id
-	def set_info(self, lower, upper):
-		self.lower = lower
-		self.upper = upper
+	def set_info(self, fv):
+		self.fv = fv
 	def decide_order(self, market, asset):
-		u = self.upper
-		l = self.lower
-		m = (u+l)//2
+		m = self.fv
 		p = market.prices[asset]
 		best_ask = market.orderbooks[asset].asks.root().price if market.orderbooks[asset].asks.size > 0 else None
 		best_bid = market.orderbooks[asset].bids.root().price if market.orderbooks[asset].bids.size > 0 else None
@@ -24,7 +22,7 @@ class Fundamentalist(Trader):
 		else:
 			best_ask = best_ask if best_ask != None else p
 			best_bid = best_bid if best_bid != None else p
-			if m-best_bid >= best_ask-m:
+			if m-best_bid > best_ask-m or (m-best_bid == best_ask-m and self.epsilon == 1):
 				p = int(round(best_bid + self.alpha*(m-best_bid)))
 				return LimitOrder('VAASM', self, 'BID', p, 1)
 			else:
@@ -33,7 +31,7 @@ class Fundamentalist(Trader):
 
 
 
-opening_price = 1020
+opening_price = 1000
 nb_ticks = 1000
 
 file = open('trace.dat', 'w')
@@ -43,16 +41,18 @@ m = Market(['VAASM'], out=file, trace=['order', 'tick', 'price'], init_price=ope
 for p in [950, 1000, 1050]:
 	for i in range(1,100):
 		t = Fundamentalist(m, aggressiveness=i/100)
-		t.set_info(p-100, p+100)
+		t.set_info(p)
 		m.add_trader(t)
 
 # for i in range(1,10000):
-# 	p = random.randint(800, 1200)
-# 	if random.random() < .5:
-# 		p = 1000
+# 	#p = normal(1000, 50)
+# 	p = random.randint(900,1100)
+# 	#p = laplace(1000,36)
+# 	# if random.random() < .3:
+# 	# 	p = 1000
 # 	a = random.random()
 # 	t = Fundamentalist(m, aggressiveness=a)
-# 	t.set_info(p-100, p+100)
+# 	t.set_info(p)
 # 	m.add_trader(t)
 
 # On fait tourner le marché...
@@ -62,25 +62,3 @@ for t in range(nb_ticks):
 m.out = sys.stdout
 m.print_state()
 file.close()
-
-
-
-# w = [0, 0, 0]
-# for t in m.traders:
-# 	w[(t.trader_id-1)//99] += t.get_wealth(m)
-# print("Wealth (fv=950): %.2f\nWealth (fv=1000): %.2f\nWealth (fv=1050): %.2f\n" % (w[0]/99, w[1]/99, w[2]/99))
-
-
-
-from data_processing import *
-
-Prices = extract_prices('trace.dat')
-T, P = Prices['VAASM']
-plt.plot(T, P, '-')
-plt.xlabel("Time")
-plt.ylabel("Price")
-
-plt.figure()
-draw_returns_hist('trace.dat', 'VAASM', 100)
-
-plt.show()
