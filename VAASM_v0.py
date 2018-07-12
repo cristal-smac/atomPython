@@ -1,4 +1,5 @@
 from atom import *
+from numpy.random import normal
 
 class Fundamentalist(Trader):
 	def __init__(self, market, aggressiveness, initial_assets=None, cash=0):
@@ -33,7 +34,7 @@ class Fundamentalist(Trader):
 
 
 opening_price = 1020
-nb_ticks = 10
+nb_ticks = 1000
 
 file = open('trace.dat', 'w')
 m = Market(['VAASM'], out=file, trace=['order', 'tick', 'price'], init_price=opening_price, fix='L')
@@ -45,6 +46,15 @@ for p in [950, 1000, 1050]:
 		t.set_info(p-100, p+100)
 		m.add_trader(t)
 
+# for i in range(1,10000):
+# 	p = random.randint(800, 1200)
+# 	if random.random() < .5:
+# 		p = 1000
+# 	a = random.random()
+# 	t = Fundamentalist(m, aggressiveness=a)
+# 	t.set_info(p-100, p+100)
+# 	m.add_trader(t)
+
 # On fait tourner le marché...
 for t in range(nb_ticks):
 	m.run_once(shuffle=True)
@@ -54,10 +64,13 @@ m.print_state()
 file.close()
 
 
-w = [0, 0, 0]
-for t in m.traders:
-	w[(t.trader_id-1)//99] += t.get_wealth(m)
-print("Wealth (fv=950): %.2f\nWealth (fv=1000): %.2f\nWealth (fv=1050): %.2f\n" % (w[0]/99, w[1]/99, w[2]/99))
+
+# w = [0, 0, 0]
+# for t in m.traders:
+# 	w[(t.trader_id-1)//99] += t.get_wealth(m)
+# print("Wealth (fv=950): %.2f\nWealth (fv=1000): %.2f\nWealth (fv=1050): %.2f\n" % (w[0]/99, w[1]/99, w[2]/99))
+
+
 
 from data_processing import *
 
@@ -66,4 +79,8 @@ T, P = Prices['VAASM']
 plt.plot(T, P, '-')
 plt.xlabel("Time")
 plt.ylabel("Price")
+
+plt.figure()
+draw_returns_hist('trace.dat', 'VAASM', 100)
+
 plt.show()
