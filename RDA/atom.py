@@ -105,6 +105,9 @@ class ZITTrader(Trader):
         self.p_max = p_max
         self.q_min = q_min
         self.q_max = q_max
+    def set_info(self, l, u):
+        self.p_min = l 
+        self.p_max = u 
     def __str__(self):
         return "ZIT %i" % self.trader_id
     def decide_order(self, market, asset):

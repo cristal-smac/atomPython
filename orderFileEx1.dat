@@ -1,4 +1,4 @@
-NewAgent;Agent 1;0;LVMH;0
+NewAgent;Agent 1;0;LVMH:0
 LimitOrder;LVMH;Agent 1;BID;45500;13
 LimitOrder;LVMH;Agent 1;BID;42000;14
 LimitOrder;LVMH;Agent 1;ASK;12000;10

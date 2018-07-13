@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats
+import statsmodels.tsa.stattools as stats
 
 def extract_prices(filename):
 	Prices = dict()
@@ -60,9 +61,11 @@ def draw_returns_hist(filename, asset, nb_pts, tau=1):
 	mu = np.mean(Returns)
 	sigma = np.sqrt(np.mean((Returns-mu)**2))
 	N = scipy.stats.norm.pdf(R2, mu, sigma) # Loi normale de même espérance et écart-type que les rentabilités
+	#L = scipy.stats.laplace.pdf(R2, mu, sigma/np.sqrt(2))
 	X = ((R-mu)/sigma)**4
 	plt.semilogy(R, D, 'o', label='Returns for tau = %i. Kurtosis = %.2f' % (tau, 3+scipy.stats.kurtosis(Returns)))
 	plt.semilogy(R2, N, '--', label='Normal PDF')
+	#plt.semilogy(R2, L, '--', label='Laplace PDF')
 	plt.xlabel('Returns')
 	plt.ylabel('Density')
 	plt.legend(loc='best')
@@ -70,6 +73,20 @@ def draw_returns_hist(filename, asset, nb_pts, tau=1):
 	r = np.max(np.abs(R))*1.05
 	plt.axis([-r, r, 10**-3, max(D)*2])
 	plt.grid()
+	plt.show()
+
+def acf(filename, asset):
+	Prices = np.array(extract_prices(filename)[asset][1])
+	Returns = np.log(Prices[1:]) - np.log(Prices[:-1])
+	acf = stats.acf(Returns, nlags=20)
+	plt.plot(range(21), acf, 'o', color="orange")
+	plt.bar([x+0.02 for x in range(21)], acf, .04, color="orange")
+	plt.axhline(0, color='k')
+	sigma = max(np.abs(acf[10:]))
+	plt.axhline(sigma, color='k', linestyle='--')
+	plt.axhline(-sigma, color='k', linestyle='--')
+	plt.xlabel('Lag')
+	plt.ylabel('Autocorrelation')
 	plt.show()
 
 def smooth(lst, p):

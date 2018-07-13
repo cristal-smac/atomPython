@@ -1,16 +1,16 @@
 #!/usr/bin/python
 
 from atom import *
+from data_processing import *
 
-# out = open('trace.replay.dat', 'w')
-# m = Market(out, print_orderbooks=False)
-# m.add_asset(OrderBook('Apple'))
-# m.add_asset(OrderBook('Microsoft'))
+file = open('trace.dat', 'w')
+m = Market(['LVMH'], out=file, trace=['price'])
 
-# m.replay('trace.dat')
-# m.print_state()
-# out.close()
+for i in range(100):
+	m.add_trader(ZITTrader(m, q_min=1, q_max=1))
+for i in range(5000):
+	m.run_once()
 
-m = Market(['LVMH', 'Apple'], print_orderbooks=True)
-m.generate(2, 5)
-m.print_state()
+file.close()
+
+draw_returns_hist('trace.dat', 'LVMH', 100)
