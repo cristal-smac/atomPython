@@ -1,0 +1,816 @@
+\documentclass[a4paper]{article}
+
+\usepackage{makeidx}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage{mathtools,amssymb,amsmath}
+\usepackage{mathrsfs}
+\usepackage{mathabx}
+\usepackage{yfonts}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{thmbox}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage{multirow}
+\usepackage{bbm}
+\usepackage{multicol}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, quotes}
+\usepackage{ifthen}
+
+\geometry{top=3cm,left=2cm,bottom=3cm,right=2cm}
+
+\lhead{}
+
+\renewcommand{\headrulewidth}{0pt}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}} 
+\newcommand{\D}{\mathbb{D}} 
+\newcommand{\Q}{\mathbb{Q}} 
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\U}{\mathbb{U}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Pb}{\mathbb{P}}
+\newcommand{\Unb}{\mathbbm{1}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\Sc}{\mathcal{S}}
+\newcommand{\Fg}{\mathfrak{F}}
+\newcommand{\Ag}{\mathfrak{A}}
+\newcommand{\Sg}{\mathfrak{S}}
+\newcommand{\Mc}{\mathcal{M}}
+\newcommand{\GLc}{\mathcal{GL}}
+\newcommand{\SLc}{\mathcal{SL}}
+\newcommand{\Bc}{\mathcal{B}}
+\newcommand{\Pc}{\mathcal{P}}
+\newcommand{\Oc}{\mathcal{O}}
+\newcommand{\V}{\mathbb{V}}
+\renewcommand{\Im}{\mathrm{Im}}
+\newcommand{\Ker}{\mathrm{Ker}}
+\renewcommand{\det}{\mathrm{det}}
+\newcommand{\argsmin}{\mathrm{argsmin}}
+\newcommand{\argsmax}{\mathrm{argsmax}}
+\newcommand{\Mat}{\mathrm{Mat}}
+\newcommand{\Rac}{\mathrm{Rac}}
+\newcommand{\Res}{\mathrm{Res}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\Supp}{\mathrm{Supp}}
+\newcommand{\Cg}{\mathfrak{C}}
+\newcommand{\Lg}{\mathfrak{L}}
+\newcommand{\ps}[2]{\left\langle#1,#2\right\rangle}
+\newcommand{\homeo}{\underset{\text{homéo}}{\clap{$\simeq$}}} % Homéomorphe
+\newcommand{\nothomeo}{\underset{\text{homéo}}{\clap{$\not\simeq$}}}
+\newcommand{\fun}[5]{\begin{array}{cccc}
+#1~: & #2 & $\longrightarrow$ & #3 \\
+    & #4 & $\longmapsto$ & #5 \end{array}}
+\newcommand{\under}[2]{\underbrace{#1}_{\clap{$#2$}}}
+\newcommand{\jacobi}[2]{\genfrac{(}{)}{}{1}{#1}{#2}}
+\newcommand{\defeq}{\overset{\Delta}{=}}
+\newcommand{\Lm}{\preceq_\mathrm{Lm}} % leximin
+\newcommand{\Lms}{\precsim_\mathrm{Lm}}
+
+\def\restriction#1#2{\mathchoice
+              {\setbox1\hbox{${\displaystyle #1}_{\scriptstyle #2}$}
+              \restrictionaux{#1}{#2}}
+              {\setbox1\hbox{${\textstyle #1}_{\scriptstyle #2}$}
+              \restrictionaux{#1}{#2}}
+              {\setbox1\hbox{${\scriptstyle #1}_{\scriptscriptstyle #2}$}
+              \restrictionaux{#1}{#2}}
+              {\setbox1\hbox{${\scriptscriptstyle #1}_{\scriptscriptstyle #2}$}
+              \restrictionaux{#1}{#2}}}
+\def\restrictionaux#1#2{{#1\,\smash{\vrule height .8\ht1 depth .85\dp1}}_{\,#2}}
+
+
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{beramono}
+
+\newcommand{\PSS}[1]{\Pb_{SS,#1}}
+\newcommand{\PMR}[1]{\Pb_{MR,#1}}
+\newcommand{\TE}[1]{\mathfrak{T}_{\mathfrak{E},#1}}
+\newcommand{\TM}[1]{\mathfrak{T}_{\mathfrak{M},#1}}
+\newcommand{\UnbP}[1]{\Unb_{\Pb_{#1}}}
+
+\newtheorem[style=S, bodystyle=\noindent]{thm}{Théorème}[section]
+\newtheorem[style=S, bodystyle=\noindent]{defn}[thm]{Définition}
+\newtheorem[style=S, bodystyle=\noindent]{propo}[thm]{Proposition}
+\newtheorem[style=S, bodystyle=\noindent]{prop}[thm]{Propriété}
+\newtheorem[style=S, bodystyle=\noindent]{coro}[thm]{Corollaire}
+\newtheorem[style=S, bodystyle=\noindent]{lem}[thm]{Lemme}
+\newtheorem[style=S, headstyle=\bfseries\boldmath Théorème, bodystyle=\noindent]{thm*}{Théorème}
+\newtheorem[style=S, headstyle=\bfseries\boldmath Définition, bodystyle=\noindent]{defn*}{Définition}
+\newtheorem[style=S, headstyle=\bfseries\boldmath Proposition, bodystyle=\noindent]{propo*}{Proposition}
+\newtheorem[style=S, headstyle=\bfseries\boldmath Propriété, bodystyle=\noindent]{prop*}{Propriété}
+\newtheorem[style=S, headstyle=\bfseries\boldmath Corollaire, bodystyle=\noindent]{coro*}{Corollaire}
+\newtheorem[style=S, headstyle=\bfseries\boldmath Lemme, bodystyle=\noindent]{lem*}{Lemme}
+
+\title{Exécution d'ordres.}
+\author{}
+\date{}
+\rhead{}
+\allowdisplaybreaks
+
+\begin{document}
+
+\pagestyle{fancy}
+\maketitle
+
+\paragraph{}
+On s'intéresse aux marchés avec un unique carnet d'ordre. Soit $(A_i)_{i\in\N^*}$ l'ensemble des agents. On appele ordre tout quadruplet de la forme $o = (o_A, o_d, o_p, o_q)$ avec $o_A \in (A_i)_{i\in\N^*},~o_d \in \{\text{ask},\text{bid}\},~o_p>0$ et $o_q>0$. $\Omega$ dénote l'ensemble des ordres et $\Omega_n$ dénote l'ensemble des parties $\Oc$ de $\Omega$ à n éléments tq $\forall o \neq o' \in \Oc,~o_A \neq o'_A$. On note aussi $w_i$ le wealth de l'agent i, $c_i \geq 0$ son cash initial et $n_i \geq 0$ ses assets initiaux. On suppose aussi que les agents ne peuvent avoir de cash ni d'assets négatifs.
+
+\par
+Si $W$ est une fonction de bien-être social prenant en entrée les $w_i$, on peut définir $\tilde W$ prenant en entrée les $(c_i)_{1\leq i\leq n}$, les $(n_i)_{1\leq i\leq n}$ et un séquence d'ordres $\Oc = (o_1, \ldots, o_n)$ et retourant le bien-être social $\tilde W((c_i, n_i)_{1\leq i\leq n}, \Oc)$ après l'exécution de la séquence d'ordre $\Oc$ sur le marché initialisé avec un carnet d'ordres vide et dont les agents sont initialisés avec les conditions initiales $CI = (c_i, n_i)_{1\leq i\leq n}$. On notera alors $W_{CI} : \Oc \mapsto \tilde W(CI, \Oc)$.
+
+\par
+On se demande si, à $W$ fixé, il existe une relation d'ordre total $\preceq$ sur l'ensemble $\Omega$ des ordres possibles tq pour tout sous-ensemble fini $\Oc = \{o_1, \ldots, o_n\} \in \Omega_n$, pour toutes conditions initiales $CI \in \N^{2n}$, la séquence $(o_{\sigma(1)}, \ldots, o_{\sigma(n)})$ tq $o_{\sigma(1)} \preceq \ldots \preceq o_{\sigma(n)}$ maximise le welfare, i.e. : \\
+\[W_{CI}(o_{\sigma(1)}, \ldots, o_{\sigma(n)}) = \max_{\tau \in \Sg_n}W_{CI}(o_{\tau(1)}, \ldots, o_{\tau(n)})\]
+
+\par
+Remarque: Il n'y généralement pas unicité de la séquence maximisant ce welfare. On demande juste que celle triée selon $\preceq$ soit une d'entre elles.
+
+\par On note $\Sg_\Oc$ l'ensemble des séquences dont les éléments sont exactement les éléments de $\Oc$ et $W_u$ le welfare utilitaire, $W_{\min}$ le welfare min, $W_{\max}$ le welfare max et $W_N$ le welfare de Nash. On se donne $p_0 \geq 0$ : c'est le prix initial donné aux assets lorsque qu'aucun prix n'a encore été fixé.
+
+\section{Séquences de deux ordres}
+
+On va montrer le résultat (simple) suivant :
+\begin{prop}
+Si $\Oc \in \Omega_2$, il existe une séquence $s \in \Sg_{\mathcal O}$ maximisant à la fois $W_u$, $W_N$, $W_{\min}$ et $W_{\max}$ quelles que soient les conditions initiales.
+\end{prop}
+
+\begin{proof}
+Si les deux ordres ont la même direction, ou si un est un ask et l'autre un bid avec $p_\text{ask}$ > $p_\text{bid}$, alors aucun prix n'est fixé et le résultat est trivial. \\
+Dans le cas où $\mathcal O = \{o_1 = (A_1, \text{ask}, p_a, q_a), o_2 = (A_2, \text{bid}, p_b, q_b)\}$ avec $p_b \geq p_a$, notons $q = \min(q_a,q_b)$. \\
+Quelle que soit la séquence d'exécution, un prix $p\in\{p_a,p_b\}$ sera fixé et une quantité $q$ sera échangée. On aura donc $w_1 = (c_1 + qp) + (n_1-q)p = c_1+n_1p$ et $w_2 = (c_2 - qp) + (n_2+q)p = c_2+n_2p$, d'où $W_u = c_1+c_2+(n_1+n_2)p$, $W_N = (c_1+n_1p)(c_2+n_2p)$, $W_{\min} = \min_i(c_i + n_ip)$ et $W_{\max} = \max_i(c_i + n_ip)$. Toutes ces quantités étant croissantes selon $p$, elles sont toutes maximisées pour la séquence $(o_2, o_1)$ puisque le prix fixé sera $p_b \geq p_a$.
+\end{proof}
+
+Au passage, on peut montrer le résultat suivant :
+\begin{prop}
+\label{prop1}
+Si $\mathcal O$ est consitué d'un ordre ask $o_a$ et d'un ordre bid $o_b$, alors :
+\begin{itemize}
+	\item Si $p_a \geq p_b$, alors le welfare final ne dépend pas de la séquence d'exécution.
+	\item Si $p_a < p_b$, alors $W_u(o_b,o_a) > W_u(o_a,o_b)$ et $W_N(o_b,o_a) > W_N(o_a,o_b)$
+	\item Si $p_a < p_b$, alors $W_{\min}(o_b,o_a) \geq W_{\min}(o_a,o_b)$ avec cas d'égalité lorsque $n_b = 0$ et $c_b \leq c_a + n_ap_a$.
+	\item Si $p_a < p_b$, alors $W_{\max}(o_b,o_a) \geq W_{\max}(o_a,o_b)$ avec cas d'égalité lorsque $n_b = 0$ et $c_b \geq c_a + n_ap_b$.
+\end{itemize}
+\end{prop}
+
+\begin{proof}
+Le premier point est trivial et le second point se prouve en remarquant que $n_a > 0$. \\
+Le troisième point est plus long à prouver : l'inégalité est évidente mais le cas d'égalité ne l'est pas : il s'agit d'étudier quand on a $\min(c_a + n_ap_a, c_b + n_bp_a) = \min(c_a + n_ap_b, c_b + n_bp_b)$. Comme $p_a < p_b$, avoir $n_b = 0$ est une condition nécessaire, ce qui nous ramène à étudier quand $\min(c_a + n_ap_a, c_b) = \min(c_a + n_ap_b, c_b)$ ce qui est vrai ssi $c_b \leq c_a + n_ap_a$. Il suffit ensuite de vérifier que la réciproque (si $n_b = 0$ et $c_b \leq c_a + n_ap_a$ alors on a l'égalité) est vraie. \\
+La quatrième point s'étudie comme le troisième.
+\end{proof}
+
+On remarque au passage qu'on ne peut pas avoir à la fois le cas d'égalité pour $W_{\min}$ et pour $W_{\max}$ lorsque $p_a < p_b$.
+
+ \section{Interlude : Un lemme utile}
+
+On note $\argsmax_{x\in X}f(x)$ l'ensemble $\{x \in X, f(x) = \max_{y\in X}f(y)\}$.
+
+\begin{lem}
+	\label{lem1}
+	Soit $n \geq 2$. Soit $\Oc = \{o_1, \ldots, o_n\} \in \Omega_n$. Soit $\Oc'$ et $\Oc''$ deux sous-ensembles de $\Oc$ d'intersection nulle. Soit $W$ fixé.\\
+	S'il existe $CI \in \N^{2n}$ tq, en notant $S = \argsmax_{s \in \Sg_\Oc}W_{CI}(s)$, on a pour tout $s \in S$ l'existence de $o_i\in\Oc'$ et $o_j\in\Oc''$ tq l'ordre $o_i$ apparait avant $o_j$ dans la séquence s, alors si $\preceq$ existe, il existe $o_i\in\Oc'$ et $o_j\in\Oc''$ tq $o_i \preceq o_j$.
+\end{lem}
+
+\begin{proof}
+	Sous l'hypothèse que $\preceq$ existe, la séquence $s = (o_{\sigma(1)} \preceq \ldots \preceq o_{\sigma(n)})$ maximise le welfare $W$ pour toutes les conditions initiales, donc pour $CI$ en particulier. Donc $s \in S$. Par hypothèse, il existe donc $o_i \in \Oc'$ et $o_j \in \Oc''$ tq $o_i$ apparait avant $o_j$ dans s. Donc, par définition de $s$, $o_i \preceq o_j$
+\end{proof}
+
+De ce lemme et de la propriété \ref{prop1} on peut donc déduire que :
+
+\begin{prop}
+	\label{prop2}
+	Si $o_a, o_b \in \Omega^2$ avec $o_{a, d} = \text{ask}$, $o_{b, d} = \text{bid}$ et $o_{a, p} < o_{b,p}$, alors $o_b \preceq o_a$, si $W = W_u,~W_N,~W_{\min}$ ou $W_{\max}$ et si $\preceq$ existe.
+\end{prop}
+
+
+\section{Non-existence de $\preceq$ pour les welfares usuels}
+
+On va utiliser ce les résultats précédents pour montrer qu'il n'existe pas d'ordre $\preceq$ sur $\Omega$ vérifiant la propriété voulue.
+
+\subsection{Welfare min et welfare de Nash}
+~
+\begin{thm}
+	\label{thm1}
+	Soit $W = W_{\min}$ ou $W_N$. \\
+	Il n'existe pas d'ordre total $\preceq$ sur $\Omega$ tq pour tout ensemble $\Oc = \{o_1, \ldots, o_n\} \in \Omega_n$, pour toutes conditions initiales $CI \in \N^{2n}$, la séquence $(o_{\sigma(1)}, \ldots, o_{\sigma(n)})$ tq $o_{\sigma(1)} \preceq \ldots \preceq o_{\sigma(n)}$ est une des séquences de $\Oc$ maximisant le welfare $W_{CI}$.
+\end{thm}
+
+\begin{proof}
+	~\\
+	\textbf{1\up{ère} étape : Il existe $\boldsymbol{\Oc \in \Omega_3}$ constitué de deux ordres asks $\boldsymbol{o_1}$ et $\boldsymbol{o_2}$ et d'un ordre bid $\boldsymbol{o_3}$ dont le prix est supérieur à ceux des ordres asks tq ni $\boldsymbol{(o_3, o_1, o_2)}$ ni $\boldsymbol{(o_3, o_2, o_1)}$ ne maximisent le welfare.} \\
+	Soit $\Oc = \{o_1 = (A_1, \text{ask}, p_1, q_1) , o_2 = (A_2, \text{ask}, p_2, q_2), o_3 = (A_3, \text{bid}, p_3, q_3)\} \in \Omega_3$ \\ et soit $CI = (c_i, n_i)_{1\leq i\leq 3} \in \N^6$ tq :
+	\begin{multicols}{2}
+	\begin{enumerate}
+		\item $p_1 < p_3$
+		\item $p_2 < p_3$
+		\item $q_1 \leq n_1$
+		\item $q_2 \leq n_2$
+		\item $q_2 < q_3$
+		\item $q_3 - q_2 < q_1 < q_3$
+		\item $c_3 + n_3p_3 < c_1 + n_1p_3 \\< \min(c_2 + q_2p_2 + n_2p_3 - q_2p_3,\\c_3 - q_2p_2 + q_2p_3 + n_3p_3)$
+		\item $q_2(p_3-p_2) < (c_2 + n_2p_3) - (c_3 + n_3p_3)$\\
+	\end{enumerate}
+	\end{multicols}
+	L'existence de tels $\Oc$ et $CI$ n'a rien d'une évidence : un exemple est donné en annexe \ref{appendix1}. \\
+	Dans le tableau suivant, on donne le cash et le nombre d'assets détenu par chaque agent après l'exécution de différentes séquences. Le dernier prix fixé est, dans tous les cas, $p_3$. Le détail est donné en annexe \ref{appendix2}. \\
+	\begin{center}
+	\begin{tabular}{|c|c|c|c|c|c|c|}
+		\hline
+		\multirow{2}{*}{Séquence} & \multicolumn{2}{c|}{$A_1$} & \multicolumn{2}{c|}{$A_2$} & \multicolumn{2}{c|}{$A_3$} \\
+		\cline{2-7}
+		& cash & assets & cash & assets & cash & assets \\
+		\hline
+		\multirow{2}{*}{$(o_2, o_3, o_1)$} & \multirow{2}{*}{$c_1 + (q_3-q_2)p_3$} & \multirow{2}{*}{$n_1 - (q_3-q_2)$} & \multirow{2}{*}{$c_2 + q_2p_2$} & \multirow{2}{*}{$n_2-q_2$} & $c_3 - q_2p_2$ & \multirow{2}{*}{$n_3+q_3$} \\
+		& & & & &  $-(q_3-q_2)p_3$ & \\
+		\hline
+		$(o_3,o_1,o_2)$ & $c_1+q_1p_3$ & $n_1-q_1$ & $c_2 + (q_3-q_1)p_3$ & $n_2 - (q_3-q_1)$ & $c_3 - q_3p_3$ & $n_3+q_3$ \\
+		\hline
+		$(o_3,o_2,o_1)$ & $c_1 + (q_3-q_2)p_3$ & $n_1-(q_3-q_2)$ & $c_2+q_2p_3$ & $n_2-q_2$ & $c_3 - q_3p_3$ & $n_3+q_3$ \\
+		\hline
+	\end{tabular}
+	\end{center}
+	Donc, il vient que :
+	\begin{center}
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Séquence & $w_1$ & $w_2$ & $w_3$ \\
+		\hline
+		$(o_2, o_3, o_1)$ & $c_1 + n_1p_3$ & $c_2+q_2p_2+(n_2-q_2)p_3$ & $c_3+q_2(p_3-p_2)+n_3p_3$ \\
+		\hline
+		$(o_3,o_1,o_2)$ & \multirow{2}{*}{$c_1+n_1p_3$} & \multirow{2}{*}{$c_2+n_2p_3$} & \multirow{2}{*}{$c_3+n_3p_3$} \\
+		\cline{1-1}
+		$(o_3,o_2,o_1)$ & & & \\
+		\hline
+	\end{tabular}
+	\end{center}
+	On notera $(o_3, \cdot, \cdot)$ les séquences $(o_3,o_1,o_2)$ et $(o_3,o_2,o_1)$. \\
+	On en conclut que $W_{\min,CI}(o_3, \cdot, \cdot) = \min(c_1+n_1p_3,~c_2+n_2p_3,~c_3+n_3p_3) = c_3+n_3p_3$ d'après (7), (8) et (2). \\
+	De plus, $W_{\min, CI}(o_2,o_3,o_1) = \min(c_1 + n_1p_3,~c_2+q_2p_2+(n_2-q_2)p_3,~c_3+q_2(p_3-p_2)+n_3p_3) = c_1 + n_1p_3$ d'après (7).
+	Finalement, (7) donne aussi que $\boldsymbol{W_{\min, CI}(o_2,o_3,o_1) =  c_1 + n_1p_3 > c_3 + n_3p_3 = W_{\min,CI}(o_3, \cdot, \cdot)}$. On a bien montré ce qu'on voulait pour $W_{\min,CI}$. Faisons de même pour $W_{N,CI}$ : \\ ~\\
+	$W_{N,CI}(o_3, \cdot, \cdot) = (c_1+n_1p_3)(c_2+n_2p_3)(c_3+n_3p_3)$ et \\
+	$W_{N,CI}(o_2, o_3, o_1) = (c_1+n_1p_3)(c_2+q_2p_2+(n_2-q_2)p_3)(c_3+q_2(p_3-p_2)+n_3p_3)$, d'où \\
+	$\begin{array}{rcl}
+	\dfrac{W_{N,CI}(o_2, o_3, o_1)}{W_{N,CI}(o_3, \cdot, \cdot)} & = & \dfrac{(c_2+q_2p_2+(n_2-q_2)p_3)(c_3+q_2(p_3-p_2)+n_3p_3)}{(c_2+n_2p_3)(c_3+n_3p_3)} \\
+	& = & \ldots \\
+	& = & 1 + \dfrac{q_2(p_3-p_2)[(c_2+n_2p_3) - (c_3+n_3p_3) - q_2(p_3-p_2)]}{(c_2+n_2p_3)(c_3+n_3p_3)}
+	\end{array}$ \\
+	avec $q_2\underbrace{(p_3-p_2)}_{> 0 \text{ selon (2)}}\underbrace{[(c_2+n_2p_3) - (c_3+n_3p_3) - q_2(p_3-p_2)]}_{>0 \text{ selon (8)}} > 0$. \\
+	Donc $\boldsymbol{W_{N, CI}(o_2,o_3,o_1) > W_{N,CI}(o_3, \cdot, \cdot)}$.\\~\\
+	\textbf{2\up{ème} étape : Conclusion} \\
+	Si d'aventure il existait une relation d'ordre $\preceq_{\min}$ (resp. $\preceq_{N}$) sur $\Omega$ tq pour tout ensemble $\Oc' = \{o'_1, \ldots, o'_n\} \in \Omega_n$, pour toutes conditions initiales $CI' \in \N^{2n}$, la séquence $(o'_{\sigma(1)}, \ldots, o'_{\sigma(n)})$ tq $o'_{\sigma(1)} \preceq \ldots \preceq o'_{\sigma(n)}$ est une des séquences de $\Oc'$ maximisant le welfare $W_{\min,CI'}$ (resp. $W_{N,CI'}$), alors : \\
+	Comme $o_3$ est un bid et comme $o_1, o_2$ sont des asks tq $p_1 < p_3$ (1) et $p_2 < p_3$ (2), alors de la propriété \ref{prop2} découle le fait que $o_3 \preceq_{\min} o_1$, $o_3 \preceq_{\min} o_2$, $o_3 \preceq_N o_1$ et $o_3 \preceq_N o_2$. Ces inégalités sont mêmes strictes car $o_1, o_2$ et $o_3$ sont distincts. $o_3$ est donc à la fois le minimum de $\Oc$ pour $\preceq_{\min}$ et pour $\preceq_N$. Les séquences $s_{\min}$ et $s_N$ de $\Oc$ ordonnées respectivement selon $\preceq_{\min}$ et $\preceq_N$ débutent dont toutes deux par $o_3$ i.e. sont de la forme $(o_3, \cdot, \cdot)$. Par hypothèse, $s_{\min}$ (resp. $s_{N}$) est donc un point en lequel $W_{\min, CI}$ (resp. $W_{N, CI}$) atteint son maximum, ce qui contredit les résultats de la première étape.
+\end{proof}
+
+\subsection{Welfare max}
+~
+\begin{thm}
+	\label{thm2}
+	Il n'existe pas d'ordre total $\preceq$ sur $\Omega$ tq pour tout ensemble $\Oc = \{o_1, \ldots, o_n\} \in \Omega_n$, pour toutes conditions initiales $CI \in \N^{2n}$, la séquence $(o_{\sigma(1)}, \ldots, o_{\sigma(n)})$ tq $o_{\sigma(1)} \preceq \ldots \preceq o_{\sigma(n)}$ est une des séquences de $\Oc$ maximisant le welfare $W_{\max, CI}$.
+\end{thm}
+
+\begin{proof}
+	La preuve est identitque en tous points à la preuve pour $W_{\min}$ : la seconde étape est identique, on va donc se contenter de préciser la première étape. \\
+	\textbf{1\up{ère} étape : Il existe $\boldsymbol{\Oc \in \Omega_3}$ constitué de deux ordres asks $\boldsymbol{o_1}$ et $\boldsymbol{o_2}$ et d'un ordre bid $\boldsymbol{o_3}$ dont le prix est supérieur à ceux des ordres asks tq ni $\boldsymbol{(o_3, o_1, o_2)}$ ni $\boldsymbol{(o_3, o_2, o_1)}$ ne maximisent le welfare.} \\
+	Soit $\Oc = \{o_1 = (A_1, \text{ask}, p_1, q_1) , o_2 = (A_2, \text{ask}, p_2, q_2), o_3 = (A_3, \text{bid}, p_3, q_3)\} \in \Omega_3$ \\ et soit $CI = (c_i, n_i)_{1\leq i\leq 3} \in \N^6$ tq :
+	\begin{multicols}{2}
+	\begin{enumerate}
+		\item $p_1 < p_3$
+		\item $p_2 < p_3$
+		\item $q_1 \leq n_1$
+		\item $q_2 \leq n_2$\\
+		\item $q_1 < q_3 < q_2$
+		\item $q_3p_3 < c_3$
+		\item $\max(c_1+q_1p_1+(n_1-q_1)p_3,~c_2+n_2p_3) \\ < c_3+q_1(p_3-p_1)+n_3p_3$
+		\item $\max(c_1+n_1p_3,~c_2+n_2p_3) < c_3+n_3p_3$
+	\end{enumerate}
+	\end{multicols}
+	Un exemple est fournit en annexe \ref{appendix3}
+	Dans le tableau suivant, on donne le cash et le nombre d'assets détenu par chaque agent après l'exécution de différentes séquences. Le dernier prix fixé est, dans tous les cas, $p_3$. Le détail est donné en annexe \ref{appendix4}. \\
+	\begin{center}
+	\begin{tabular}{|c|c|c|c|c|c|c|}
+		\hline
+		\multirow{2}{*}{Séquence} & \multicolumn{2}{c|}{$A_1$} & \multicolumn{2}{c|}{$A_2$} & \multicolumn{2}{c|}{$A_3$} \\
+		\cline{2-7}
+		& cash & assets & cash & assets & cash & assets \\
+		\hline
+		\multirow{2}{*}{$(o_1, o_3, o_2)$} & \multirow{2}{*}{$c_1 + q_1p_1$} & \multirow{2}{*}{$n_1-q_1$} & \multirow{2}{*}{$c_2 + (q_3-q_1)p_3$} & \multirow{2}{*}{$n_2-(q_3-q_1)$} & $c_1 - q_1p_1$ & \multirow{2}{*}{$n_3+q_3$} \\
+		& & & & &  $-(q_3-q_1)p_3$ & \\
+		\hline
+		$(o_3,o_1,o_2)$ & $c_1+q_1p_3$ & $n_1-q_1$ & $c_2 + (q_3-q_1)p_3$ & $n_2 - (q_3-q_1)$ & $c_3 - q_3p_3$ & $n_3+q_3$ \\
+		\hline
+		$(o_3,o_2,o_1)$ & $c_1$ & $n_1$ & $c_2+q_3p_3$ & $n_2-q_3$ & $c_3-q_3p_3$ & $n_3+q_3$ \\
+		\hline
+	\end{tabular}
+	\end{center}
+	Donc, il vient que :
+	\begin{center}
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Séquence & $w_1$ & $w_2$ & $w_3$ \\
+		\hline
+		$(o_1, o_3, o_2)$ & $c_1 + q_1p_1 + (n_1-q_1)p_3$ & $c_2+n_2p_3$ & $c_3+q_1(p_3-p_1)+n_3p_3$ \\
+		\hline
+		$(o_3,o_1,o_2)$ & \multirow{2}{*}{$c_1+n_1p_3$} & \multirow{2}{*}{$c_2+n_2p_3$} & \multirow{2}{*}{$c_3+n_3p_3$} \\
+		\cline{1-1}
+		$(o_3,o_2,o_1)$ & & & \\
+		\hline
+	\end{tabular}
+	\end{center}
+	On notera $(o_3, \cdot, \cdot)$ les séquences $(o_3,o_1,o_2)$ et $(o_3,o_2,o_1)$. \\
+	On a $W_{\max,CI}(o_3, \cdot, \cdot) = \max(c_1+n_1p_3,~c_2+n_2p_3,~c_3+n_3p_3) = c_3+n_3p_3$ selon (8). \\
+	Et $W_{\max,CI}(o_1, o_3, o_2) = \max(c_1 + q_1p_1 + (n_1-q_1)p_3,~c_2+n_2p_3,~c_3+q_1(p_3-p_1)+n_3p_3) = c_3+q_1(p_3-p_1)+n_3p_3$ selon (7), \\
+	d'où $\boldsymbol{W_{\max,CI}(o_3, \cdot, \cdot) = c_3+n_3p_3 < c_3+q_1(p_3-p_1)+n_3p_3 = W_{\max,CI}(o_1, o_3, o_2)}$ selon (1).
+\end{proof}
+
+\subsection{Welfare utilitaire}
+
+On notera dans cette partie les conditions initiales $CI = (c_i(0), n_i(0))_{1\leq i\leq n}$. On appelle instant $t+1$ l'instant où est placé le premier ordre ou où est fixé le premier prix depuis l'instant $t$.
+
+\begin{lem}
+	Soit $CI$ fixées. \\
+	Il existe $C\geq 0$ et $N\geq 0$ tq $\forall \Oc = \{o_1, \ldots, o_n\}\in \Omega_n, \forall m \leq n$, $W_{u, CI}(o_1, \ldots, o_m) = C + Np_m$ où $p_m$ est le dernier ordre fixé après l'exécution de la séquence $(o_1, \ldots, o_m)$.
+\end{lem}
+
+\begin{proof}
+	Soit $t \geq 0$.\\
+	Si l'instant $t+1$ a été fixé par un ordre placé, on a trivialement $\sum_{1\leq i\leq n}c_i(t+1) = \sum_{1\leq i\leq n}c_i(t)$ et $\sum_{1\leq i\leq n}n_i(t+1) = \sum_{1\leq i\leq n}n_i(t)$. \\
+	Si l'instat $t+1$ a été fixé par un prix qui a été fixé, noté $A_i$ l'agent dont provient l'ordre ask, $A_j$ celui dont provient le bid, $q$ la quantité échangée et $p$ le prix fixé. On a $\forall k \not\in \{i,j\}, c_k(t+1) = c_k(t)$ et $n_k(t+1) = n_k(t)$ et : \\
+	$c_i(t+1) = c_i(t) + qp$, $n_i(t+1) = n_i(t) - q$, $c_j(t+1) = c_j(t) - qp$ et $n_j(t+1) = n_j(t) + q$. \\
+	Donc $\sum_{1\leq i\leq n}c_i(t+1) = \sum_{1\leq i\leq n}c_i(t)$ et $\sum_{1\leq i\leq n}n_i(t+1) = \sum_{1\leq i\leq n}n_i(t)$ dans tous les cas : $\sum_ic_i$ et $\sum_in_i$ sont constantes. On les notes respectivement $C$ et $N$.
+	Alors $W_{u,CI}(t) = \sum_iw_i(t) = \sum_i c_i(t) + n_i(t)p = C + Np$ avec $p$ le dernier prix fixé.
+\end{proof}
+
+En fait, on pourra montrer qu'il n'existe pas de contre-exemples avec 3 ordres, mais il en existe avec 4 ordres.
+
+\section{Welfare leximin}
+
+\subsection{Formalisme}
+~
+\begin{defn}[Pré-ordre total leximin]
+	Soit $n\in\N^*$ et $x,y \in \R^n$. On définit le pré-ordre total leximin $\Lm$ par $x \Lm y$ ssi, en notant $\sigma, \tau \in \Sg_n$ des permutations tq $x_{\sigma(1)} \leq \ldots \leq x_{\sigma(n)}$ et $y_{\tau(1)} \leq \ldots \leq y_{\tau(n)}$, il existe $k \in [\![1,n+1]\!]$ tq $\forall i < k, x_{\sigma(i)} = y_{\tau(i)}$ et, si $k \leq n$, $x_{\sigma(k)} < y_{\tau(k)}$. \\
+	Informellement, $x$ est plus petit que $y$ lorsque la séquence des coordonnées de x triées dans l'ordre croissant est lexicographiquement plus petite que la séquence des coordonnées de y triées également dans l'ordre croissant.
+\end{defn}
+
+\par
+On quotiente alors $\R^n$ par la relation d'équivalence $\sim$ définie par $x\sim y$ lorsque $x \Lm y$ et $y \Lm x$ (i.e. lorsque les coordonnées de x sont une permutations des coordonnées de y). La relation $\Lms$ sur $\R^n/\sim$ définie par $X\Lms Y$ lorsque $\forall x \in X,\forall y \in Y, x\Lm y$ est alors une relation d'ordre totale\footnote{Bourbaki, \'Eléments de mathématique : Théorie des ensembles, Paris, Masson, 1998, ch III, \S 1, n\up{o}2, p3} sur $\R^n/\sim$. Pour une partie finie $P$ de $\R^n$, on définit alors $\max_{\Lms}P$ comme étant égal à l'intersection entre $P$ et le maximum de $\{\bar x, x \in P\}$ pour $\Lms$, où $\bar x$ désigne la classe d'équivalence de $x$ par $\sim$.
+
+\par
+On se demande si, en appellant welfare lexmin $W$ la fonction identité définie sur l'union des $R^n$ avec $n\in\N^*$, il existe un ordre total $\preceq$ sur $\Omega$ tq pour tout $n$, pour tout ensemble $\Oc = \{o_1,\ldots,o_n\}\in\Omega_n$, pour toutes conditions initiales $CI\in\N^{2n}$, on a $W_{CI}(o_{\sigma(1)},\ldots,o_{\sigma(n)}) \in \max_{\Lms, \tau \in \Sg_n}W_{CI}(o_{\tau(1)}, \ldots, o_{\tau(n)})$ avec $\sigma \in \Sg_n$ tq $o_{\sigma(1)} \preceq \ldots \preceq o_{\sigma(n)}$.
+
+La réponse est non : il suffit de reprendre le contre-exemple de $W_{\min}$ (et la propriété \ref{prop1} reste vraie).
+
+\newpage
+\appendix
+
+\section{Détails de la preuve du théorème \ref{thm1}}
+
+\subsection{Exemple d'ensembles $\Oc$ et $CI$ vérifiant les hypothèses}
+\label{appendix1}
+\begin{center}
+$\begin{array}{|c|c|c|c|c|}
+	\hline
+	i & p_i & q_i & c_i & n_i \\
+	\hline
+	1 & 1463 & 3 & 20932 & 4 \\
+	\hline
+	2 & 1248 & 4 & 45856 & 24 \\
+	\hline
+	3 & 5528 & 6 & 12339 & 5 \\
+	\hline
+\end{array}$
+\end{center}
+
+\subsection{Preuve des valeurs obtenues pour le cash et les assets après exécution des différentes séquences}
+\label{appendix2}
+
+\par
+On représente un carnet d'ordre de la façon suivante :
+\begin{center}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_1$};
+\node [below right] at (0,1) {\small $q_1$};
+\node [left] at (0,1) {\small $A_1$};
+\draw [thick] (1,2) --(3,2);
+\node [above left] at (3,2) {\small $p_3$};
+\node [below left] at (3,2) {\small $q_3$};
+\node [right] at (3,2) {\small $A_3$};
+\draw [thick] (0,3) --(2,3);
+\node [above right] at (0,3) {\small $p_2$};
+\node [below right] at (0,3) {\small $q_2$};
+\node [left] at (0,3) {\small $A_2$};
+\end{tikzpicture}
+\end{center}
+avec, sur cet exemple, $A_i$ un agent ayant placé un ordre au prix $p_i$ pour une quantité $q_i$. Les ordres 1 et 2 sont des asks, l'ordre 3 est un bid, et l'échelle verticale est l'échelle des prix : $p_1 < p_3 < p_2$.
+
+\subsubsection{Séquence $(o_2,o_3,o_1)$}
+
+~\begin{center}
+\begin{tabular}{c|c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2$};
+\node [left] at (0,1) {\small $A_2$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2$};
+\node [left] at (0,1) {\small $A_2$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_2$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+\\
+Ajout de $o_2$ & Ajout de $o_3$ & Match entre $o_2$ et $o_3$
+\end{tabular} \\ \vspace{1cm}
+\begin{tabular}{c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,2) --(2,2);
+\node [above right] at (0,2) {\small $p_1$};
+\node [below right] at (0,2) {\small $q_1$};
+\node [left] at (0,2) {\small $A_1$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_2$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,2) --(2,2);
+\node [above right] at (0,2) {\small $p_1$};
+\node [below right] at (0,2) {\small $q_1 - (q_3-q_2)$};
+\node [left] at (0,2) {\small $A_1$};
+\end{tikzpicture}
+\\
+Ajout de $o_1$ & Match entre $o_1$ et $o_3$
+\end{tabular}
+\end{center}~
+
+\subsubsection{Séquence $(o_3,o_1,o_2)$}
+
+~\begin{center}
+\begin{tabular}{c|c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,2) --(2,2);
+\node [above right] at (0,2) {\small $p_1$};
+\node [below right] at (0,2) {\small $q_1$};
+\node [left] at (0,2) {\small $A_1$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_1$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+\\
+Ajout de $o_3$ & Ajout de $o_1$ & Match entre $o_1$ et $o_3$
+\end{tabular} \\ \vspace{1cm}
+\begin{tabular}{c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2$};
+\node [left] at (0,1) {\small $A_2$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_1$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2-(q_3-q_1)$};
+\node [left] at (0,1) {\small $A_2$};
+\end{tikzpicture}
+\\
+Ajout de $o_2$ & Match entre $o_2$ et $o_3$
+\end{tabular}
+\end{center}~
+
+\subsubsection{Séquence $(o_3,o_2,o_1)$}
+
+~\begin{center}
+\begin{tabular}{c|c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2$};
+\node [left] at (0,1) {\small $A_2$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_2$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+\\
+Ajout de $o_3$ & Ajout de $o_2$ & Match entre $o_2$ et $o_3$
+\end{tabular} \\ \vspace{1cm}
+\begin{tabular}{c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,2) --(2,2);
+\node [above right] at (0,2) {\small $p_1$};
+\node [below right] at (0,2) {\small $q_1$};
+\node [left] at (0,2) {\small $A_1$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_2$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,2) --(2,2);
+\node [above right] at (0,2) {\small $p_1$};
+\node [below right] at (0,2) {\small $q_1-(q_3-q_2)$};
+\node [left] at (0,2) {\small $A_1$};
+\end{tikzpicture}
+\\
+Ajout de $o_1$ & Match entre $o_1$ et $o_3$
+\end{tabular}
+\end{center}~
+
+\section{Détails de la preuve du théorème \ref{thm2}}
+
+\subsection{Exemple d'ensembles $\Oc$ et $CI$ vérifiant les hypothèses}
+\label{appendix3}
+\begin{center}
+$\begin{array}{|c|c|c|c|c|}
+	\hline
+	i & p_i & q_i & c_i & n_i \\
+	\hline
+	1 & 1166 & 1 & 23500 & 11 \\
+	\hline
+	2 & 1002 & 13 & 14969 & 15 \\
+	\hline
+	3 & 2048 & 11 & 32763 & 24 \\
+	\hline
+\end{array}$
+\end{center}
+
+\subsection{Preuve des valeurs obtenues pour le cash et les assets après exécution des différentes séquences}
+\label{appendix4}
+~
+\subsubsection{Séquence $(o_1,o_3,o_2)$}
+
+~\begin{center}
+\begin{tabular}{c|c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,2) --(2,2);
+\node [above right] at (0,2) {\small $p_1$};
+\node [below right] at (0,2) {\small $q_1$};
+\node [left] at (0,2) {\small $A_1$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,2) --(2,2);
+\node [above right] at (0,2) {\small $p_1$};
+\node [below right] at (0,2) {\small $q_1$};
+\node [left] at (0,2) {\small $A_1$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_1$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+\\
+Ajout de $o_1$ & Ajout de $o_3$ & Match entre $o_1$ et $o_3$
+\end{tabular} \\ \vspace{1cm}
+\begin{tabular}{c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2$};
+\node [left] at (0,1) {\small $A_2$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_1$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2-(q_3-q_1)$};
+\node [left] at (0,1) {\small $A_2$};
+\end{tikzpicture}
+\\
+Ajout de $o_2$ & Match entre $o_2$ et $o_3$
+\end{tabular}
+\end{center}~
+
+\subsubsection{Séquence $(o_3,o_1,o_2)$}
+
+~\begin{center}
+\begin{tabular}{c|c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,2) --(2,2);
+\node [above right] at (0,2) {\small $p_1$};
+\node [below right] at (0,2) {\small $q_1$};
+\node [left] at (0,2) {\small $A_1$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_1$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+\\
+Ajout de $o_3$ & Ajout de $o_1$ & Match entre $o_1$ et $o_3$
+\end{tabular} \\ \vspace{1cm}
+\begin{tabular}{c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2$};
+\node [left] at (0,1) {\small $A_2$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3-q_1$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2-(q_3-q_1)$};
+\node [left] at (0,1) {\small $A_2$};
+\end{tikzpicture}
+\\
+Ajout de $o_2$ & Match entre $o_2$ et $o_3$
+\end{tabular}
+\end{center}~
+
+\subsubsection{Séquence $(o_3,o_2,o_1)$}
+
+~\begin{center}
+\begin{tabular}{c|c|c|c}
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2$};
+\node [left] at (0,1) {\small $A_2$};
+\draw [thick] (1,3) --(3,3);
+\node [above left] at (3,3) {\small $p_3$};
+\node [below left] at (3,3) {\small $q_3$};
+\node [right] at (3,3) {\small $A_3$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2-q_3$};
+\node [left] at (0,1) {\small $A_2$};
+\end{tikzpicture}
+&
+\begin{tikzpicture}
+\node [right] at (0,0) {\small ASKS};
+\node [left] at (3,0) {\small BIDS};
+\draw [thick] (0,1) --(2,1);
+\node [above right] at (0,1) {\small $p_2$};
+\node [below right] at (0,1) {\small $q_2-q_3$};
+\node [left] at (0,1) {\small $A_2$};
+\draw [thick] (0,2) --(2,2);
+\node [above right] at (0,2) {\small $p_1$};
+\node [below right] at (0,2) {\small $q_1$};
+\node [left] at (0,2) {\small $A_1$};
+\end{tikzpicture}
+\\
+Ajout de $o_3$ & Ajout de $o_2$ & Match entre $o_2$ et $o_3$ & Ajout de $o_1$
+\end{tabular}
+\end{center}~
+
+\end{document}
