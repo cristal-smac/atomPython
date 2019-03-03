@@ -23,7 +23,6 @@ Deterministic Artificial Traders that are described in "A deterministic behaviou
 **DrawOrderBooks.ipynb should not be run before OrderExecution.ipynb, as the latter generates a trace.dat file that is 
 read by the first notebook**
 
-*TestATOMv3.java*: A Java version of atom
 
 *binary_heap.py*: A Python implementation of binary heaps used by atom.py
 
