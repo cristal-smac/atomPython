@@ -1,9 +1,10 @@
-# atom
+# atomPython
 Agent-Based Financial Platform
 by Philippe Mathieu & Rémi Morvan
 
+[ATOM](https://github.com/cristal-smac/atom) est une plateforme de simulation de marchés financiers écrite en Java, puissante aussi bien d'un point de vue fonctionalités (multi-agents, multi-orders, multi-assets, intra and extra days, several price fixing, etc ...) que d'un point de vue rapidité.
+atomPython est une version très simplifiée, écrite en Python à des fins pédagogiques. Elle ne traite notamment qu'un seul ordre (LimitOrder), ne possède qu'une fixation de prix en continu et ne permet pas de multi-day. Elle est néanmoins multi-agents et multi-assets ce qui permet de nombreuss expériences sur les marchés artificiels.
 
-Ce site contient une version simplifiée de la plateforme de marchés [ATOM](https://github.com/cristal-smac/atom), ici écrite dans le langage Python. 
 Plusieurs notebooks sont fournis afin de se familiariser avec cette plateforme
 
 ## Atom.ipynb
