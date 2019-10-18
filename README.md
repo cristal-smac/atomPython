@@ -12,7 +12,7 @@ Contact : philippe.mathieu at univ-lille.fr
 
 
 ## Atom.ipynb
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/atomPython/master?filepath=Agents.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/atomPython/master?filepath=Atom.ipynb)
 
 A notebook to see the full range of the possibilities offered by this atom python version
 
