@@ -6,17 +6,17 @@ by Philippe Mathieu & Rémi Morvan
 Ce site contient une version simplifiée de la plateforme de marchés [ATOM](https://github.com/cristal-smac/atom), ici écrite dans le langage Python. 
 Plusieurs notebooks sont fournis afin de se familiariser avec cette plateforme
 
-- *Atom.ipynb*
-A notebook to see the full range of the possibilities offered by this atom python version
+##Atom.ipynb##
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/atomPython/master?filepath=Agents.ipynb)
+A notebook to see the full range of the possibilities offered by this atom python version
 
-- *tp1.ipynb*
-Notebook d'introduction à la manipulation de cette plateforme
+##tp1.ipynb##
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/atomPython/master?filepath=tp1.ipynb)
+Notebook d'introduction à la manipulation de cette plateforme
 
-- *tp2.ipynb*
-Notebook d'introduction à l'écriture de code avec cette plateforme
+##tp2.ipynb##
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/atomPython/master?filepath=tp2.ipynb)
+Notebook d'introduction à l'écriture de code avec cette plateforme
 
 
 ## Les fichiers disponibles
