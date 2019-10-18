@@ -1,25 +1,33 @@
-# atom
-Agent-Based Financial Platform
-by Philippe Mathieu & Rémi Morvan
+# atomPython
+An Agent-Based Financial Platform
 
+[ATOM](https://github.com/cristal-smac/atom) est une plateforme de simulation de marchés financiers écrite en Java, puissante aussi bien d'un point de vue fonctionalités (multi-agents, multi-orders, multi-assets, intra and extra days, several price fixing, etc ...) que d'un point de vue rapidité.
+atomPython est une version très simplifiée, écrite en Python à des fins pédagogiques. Elle ne traite notamment qu'un seul ordre (LimitOrder), ne possède qu'une fixation de prix en continu et ne permet pas de multi-day. Elle est néanmoins multi-agents et multi-assets ce qui permet de nombreuses expériences sur les marchés artificiels.
 
-Ce site contient une version simplifiée de la plateforme de marchés [ATOM](https://github.com/cristal-smac/atom), ici écrite dans le langage Python. 
 Plusieurs notebooks sont fournis afin de se familiariser avec cette plateforme
 
-- *Atom.ipynb*
-A notebook to see the full range of the possibilities offered by this atom python version
+Team : P Mathieu, R Morvan, A Fleury ([CRISTAL Lab](http://www.cristal.univ-lille.fr), [SMAC team](https://www.cristal.univ-lille.fr/?rubrique27&eid=17), [Lille University](http://www.univ-lille.fr)) , O Brandouy ([Gretha](https://gretha.u-bordeaux.fr/), [Bordeaux University](https://www.u-bordeaux.fr/))
+
+Contact : philippe.mathieu at univ-lille.fr
+
+
+## Atom.ipynb
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/atomPython/master?filepath=Agents.ipynb)
 
-- *tp1.ipynb*
-Notebook d'introduction à la manipulation de cette plateforme
+A notebook to see the full range of the possibilities offered by this atom python version
+
+## tp1.ipynb
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/atomPython/master?filepath=tp1.ipynb)
 
-- *tp2.ipynb*
-Notebook d'introduction à l'écriture de code avec cette plateforme
+Notebook d'introduction à la manipulation de cette plateforme
+
+## tp2.ipynb
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/atomPython/master?filepath=tp2.ipynb)
 
+Notebook d'introduction à l'écriture de code avec cette plateforme
 
-## Les fichiers disponibles
+
+# Les fichiers disponibles
 
 *atom.py*: main file, atom core
 
