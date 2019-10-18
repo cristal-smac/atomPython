@@ -6,7 +6,7 @@ atomPython est une version très simplifiée, écrite en Python à des fins péd
 
 Plusieurs notebooks sont fournis afin de se familiariser avec cette plateforme
 
-Team : P Mathieu, R Morvan, A Fleury (CRISTAL Lab, SMAC team, Lille University) , O Brandouy (Gretha, Bordeaux University)
+Team : P Mathieu, R Morvan, A Fleury ([CRISTAL Lab](http://www.cristal.univ-lille.fr), [SMAC team](https://www.cristal.univ-lille.fr/?rubrique27&eid=17), [Lille University](http://www.univ-lille.fr)) , O Brandouy ([Gretha](https://gretha.u-bordeaux.fr/), [Bordeaux University](https://www.u-bordeaux.fr/))
 
 Contact : philippe.mathieu at univ-lille.fr
 
