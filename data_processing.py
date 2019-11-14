@@ -47,6 +47,35 @@ def extract_wealths(filename):
 					Wealths[l[1]] = [int(l[3])], [int(l[2])]
 	return Wealths
 
+def extract_cash(filename):
+        Cash = dict()
+        with open(filename, 'r') as file:
+                for line in file:
+                        l = line.split(';')
+                        if l[0] == "Agent":
+                                if l[1] in Cash.keys():
+                                        T, C = Cash[l[1]]
+                                        T.append(int(l[-1]))
+                                        C.append(int(l[2]))
+                                else:
+                                        Cash[l[1]] = [int(l[-1])], [int(l[2])]
+        return Cash
+
+def extract_limit_orders(filename):
+        LimitOrder = dict()
+        with open(filename, 'r') as file:
+                for line in file:
+                        l = line.split(';')
+                        if l[0] == "LimitOrder":
+                                if l[2] in LimitOrder.keys():
+                                        T, L = LimitOrder[l[2]]
+                                        T.append(int(l[-1]))
+                                        L.append(l[3])
+                                else:
+                                        LimitOrder[l[2]] = [int(l[-1])], [l[3]]
+        return LimitOrder
+
+
 def draw_returns_hist(filename, asset, nb_pts, tau=1):
 	Prices = np.array(extract_prices(filename)[asset][1])
 	Returns = np.log(Prices[tau:])-np.log(Prices[:-tau])
